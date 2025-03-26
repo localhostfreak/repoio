@@ -93,3 +93,21 @@ export interface LandingPage {
   title: string;
   message: string;
 }
+
+export interface Snap {
+  _id: string;
+  sender: {
+    _ref: string;
+    _type: 'reference';
+  };
+  media?: {
+    asset: {
+      _ref: string;
+      _type: 'reference';
+    };
+  };
+  duration?: number;
+  expiresAt: string;
+  viewed: boolean;
+  _createdAt: string;
+}

@@ -408,37 +408,32 @@ app.post("/api/snaps/:id/view", async (req, res) => {
   // Create HTTP server
   const httpServer = createServer(app);
 
+  // Add the missing helper functions for Snap operations
+  async function createSnap(snapData) {
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // 24hr expiry
+    
+    return await client.create({
+      _type: 'snap',
+      ...snapData,
+      expiresAt,
+      viewed: false
+    });
+  }
+  
+  async function getSnapsByUser(userId) {
+    return await client.fetch(
+      `*[_type == "snap" && sender._ref == $userId && !viewed && dateTime(expiresAt) > dateTime(now())]`,
+      { userId }
+    );
+  }
+  
+  async function markSnapAsViewed(snapId) {
+    return await client
+      .patch(snapId)
+      .set({ viewed: true })
+      .commit();
+  }
+
   return httpServer;
 }
-// Snap routes
-app.post('/api/snaps', async (req, res) => {
-  const { media, duration, sender } = req.body;
-  const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24); // 24hr expiry
-  
-  const snap = await sanityClient.create({
-    _type: 'snap',
-    media,
-    duration,
-    sender,
-    expiresAt,
-    viewed: false
-  });
-  
-  res.json(snap);
-});
-
-app.get('/api/snaps', async (req, res) => {
-  const snaps = await sanityClient.fetch(
-    `*[_type == "snap" && !viewed && dateTime(expiresAt) > dateTime(now())]`
-  );
-  res.json(snaps);
-});
-
-app.put('/api/snaps/:id/view', async (req, res) => {
-  await sanityClient
-    .patch(req.params.id)
-    .set({viewed: true})
-    .commit();
-  res.sendStatus(200);
-});

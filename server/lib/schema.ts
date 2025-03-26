@@ -1,5 +1,5 @@
 import { landingSchema, audioType, birthdayCardSchema, loveLetterSchema } from '../../attached_assets/land';
-import { albumSchema, galleryItemSchema, audioMessageSchema } from '../../shared/sanity-schemas.js';
+import { albumSchema, galleryItemSchema, audioMessageSchema, snapSchema } from '../../shared/sanity-schemas';
 
 // Export all schema types for easy import in other files
 export const schemas = {
@@ -9,7 +9,8 @@ export const schemas = {
   loveLetter: loveLetterSchema,
   album: albumSchema,
   galleryItem: galleryItemSchema,
-  audioMessage: audioMessageSchema
+  audioMessage: audioMessageSchema,
+  snap: snapSchema
 };
 
 // Type-safe helpers for working with schemas
