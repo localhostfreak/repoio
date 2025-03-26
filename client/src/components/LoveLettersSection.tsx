@@ -2,69 +2,90 @@ import { useQuery } from "@tanstack/react-query";
 import LoveLetterCard from "./LoveLetterCard";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { Heart, PenTool } from "lucide-react";
 
 const LoveLettersSection = () => {
-  const { data: letters = [], isLoading } = useQuery({
+  const { data: letters = [], isLoading, isError } = useQuery({
     queryKey: ["/api/love-letters"],
   });
 
+  console.log("Love Letters Data:", letters);
+
   return (
     <section id="love-letters" className="py-20 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 -z-10 opacity-5">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3">
+          <Heart className="w-full h-full text-pink-500" />
+        </div>
+        <div className="absolute bottom-0 left-0 w-1/4 h-1/4">
+          <Heart className="w-full h-full text-pink-500" />
+        </div>
+      </div>
+      
       <div className="container mx-auto px-4">
-        <motion.h2 
-          className="text-4xl font-playfair text-[#FF6B6B] text-center mb-16"
+        <motion.div 
+          className="flex items-center justify-center mb-16 gap-3"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          Love Letters
-        </motion.h2>
+          <PenTool className="text-pink-500 w-8 h-8" />
+          <h2 className="text-4xl handwritten text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600 text-center">
+            Love Letters
+          </h2>
+        </motion.div>
         
-        <div className="grid md:grid-cols-2 gap-16">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           {isLoading ? (
             Array(2).fill(0).map((_, idx) => (
-              <div key={idx} className="relative h-96 bg-gray-100 animate-pulse rounded-lg"></div>
+              <div key={idx} className="relative h-96 bg-gray-800/50 animate-pulse rounded-lg"></div>
             ))
-          ) : letters.length > 0 ? (
-            letters.slice(0, 2).map((letter: any) => (
-              <LoveLetterCard 
+          ) : isError ? (
+            <div className="col-span-2 text-center py-8 glass-effect rounded-xl p-8">
+              <p className="text-pink-300">Unable to fetch love letters. Don't worry, our connection is still strong.</p>
+            </div>
+          ) : letters && letters.length > 0 ? (
+            letters.map((letter: any) => (
+              <motion.div
                 key={letter._id}
-                title={letter.title}
-                date={letter.createdAt}
-                content={Array.isArray(letter.content) 
-                  ? letter.content.map((block: any) => block.children?.map((child: any) => child.text).join("")).join("\n")
-                  : letter.content || ""}
-                coverTitle={letter.title || "From My Heart to Yours"}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="mobile-tilt"
+              >
+                <LoveLetterCard 
+                  title={letter.title || "My Love"}
+                  date={letter._createdAt || letter.createdAt || new Date().toISOString()}
+                  content={Array.isArray(letter.content) 
+                    ? letter.content.map((block: any) => 
+                        block.children?.map((child: any) => child.text).join("")).join("\n")
+                    : (typeof letter.content === 'string' ? letter.content : "No content available")}
+                  coverTitle={letter.title || "From My Heart to Yours"}
+                />
+              </motion.div>
             ))
           ) : (
-            <div className="col-span-2 text-center py-8">
-              <p className="text-[#4A4A4A]">No love letters yet. The first one is coming soon!</p>
+            <div className="col-span-2 love-card text-center py-8">
+              <p className="text-gray-300">Our love story is just beginning. Create the first love letter to express your feelings.</p>
+              <button 
+                onClick={() => {
+                  const button = document.querySelector('.createContentButton');
+                  if (button instanceof HTMLElement) {
+                    button.click();
+                  }
+                }}
+                className="mt-4 love-button"
+              >
+                Write a Love Letter
+              </button>
             </div>
-          )}
-          
-          {!isLoading && letters.length === 0 && (
-            <>
-              {/* Default letter examples when no data is available */}
-              <LoveLetterCard 
-                title="To My Beloved"
-                date={new Date().toISOString()}
-                content="The distance between us seems vast, yet in my heart you are always near. Every morning I wake up thinking of your smile, and each night I fall asleep wrapped in memories of your embrace."
-                coverTitle="From My Heart to Yours"
-              />
-              
-              <LoveLetterCard 
-                title="My Dearest"
-                date={new Date().toISOString()}
-                content="Do you remember our first date? The way the stars seemed to shine just for us that night? I was so nervous, yet the moment I saw you, all my worries melted away."
-                coverTitle="Memories of Us"
-              />
-            </>
           )}
         </div>
         
-        {letters.length > 2 && (
+        {letters && letters.length > 0 && (
           <motion.div 
             className="text-center mt-16"
             initial={{ opacity: 0 }}
@@ -72,7 +93,7 @@ const LoveLettersSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <Link href="/letters" className="inline-block text-[#FF1493] border border-[#FF1493] hover:bg-[#FF1493] hover:text-white rounded-full px-6 py-2 transition-colors duration-300">
+            <Link href="/letters" className="inline-block text-pink-400 border border-pink-500/50 hover:bg-pink-500/10 rounded-full px-6 py-2 transition-colors duration-300">
               View All Letters
             </Link>
           </motion.div>

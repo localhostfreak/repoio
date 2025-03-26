@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@400;500;600&family=Dancing+Script:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,5 +11,113 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background-color: #111827; /* dark background */
+    color: #f5f5f5;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255, 20, 147, 0.03) 0%, transparent 80%),
+      radial-gradient(circle at 80% 20%, rgba(255, 20, 147, 0.05) 0%, transparent 50%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+
+  p {
+    font-family: 'Lora', serif;
+  }
+
+  .handwritten {
+    font-family: 'Dancing Script', cursive;
+  }
+}
+
+@layer components {
+  .love-card {
+    @apply relative overflow-hidden rounded-lg bg-black/30 backdrop-blur-sm border border-pink-500/20 p-6 transition-all duration-500;
+    box-shadow: 0 4px 20px rgba(255, 20, 147, 0.15);
+  }
+
+  .love-card:hover {
+    @apply border-pink-500/40;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(255, 20, 147, 0.2);
+  }
+
+  .glass-effect {
+    @apply bg-black/30 backdrop-blur-md border border-white/10;
+  }
+
+  .love-button {
+    @apply relative overflow-hidden bg-gradient-to-r from-pink-600 to-pink-500 text-white px-6 py-3 rounded-full font-medium transition-all duration-300;
+    box-shadow: 0 4px 10px rgba(255, 20, 147, 0.3);
+  }
+
+  .love-button:hover {
+    @apply from-pink-500 to-pink-400;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 20, 147, 0.4);
+  }
+
+  .love-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(255, 20, 147, 0.3);
+  }
+
+  .love-input {
+    @apply bg-gray-800/50 border-gray-700 focus:border-pink-500 text-white rounded-lg p-3 outline-none transition-all;
+  }
+
+  .love-input:focus {
+    box-shadow: 0 0 0 2px rgba(255, 20, 147, 0.2);
+  }
+}
+
+/* Animation classes */
+.floating {
+  animation: floating 6s ease-in-out infinite;
+}
+
+.floating-slow {
+  animation: floating 8s ease-in-out infinite;
+}
+
+.floating-fast {
+  animation: floating 4s ease-in-out infinite;
+}
+
+.pulse-love {
+  animation: pulse-love 2s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-love {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Mobile-specific animations */
+@media (max-width: 768px) {
+  .mobile-tilt {
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+  }
+  
+  .mobile-tilt:hover {
+    transform: perspective(500px) rotateY(5deg);
   }
 }
