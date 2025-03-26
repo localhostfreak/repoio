@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Eye, CalendarDays, ImageIcon, Tag, MapPin } from "lucide-react";
 import { Link } from "wouter";
-import { Album } from "../../shared/sanity-types";
+import { Album } from "../../../shared/sanity-types";
 
 interface AlbumCardProps {
   album: Album;
