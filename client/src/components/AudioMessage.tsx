@@ -136,7 +136,8 @@ const AudioMessage = ({ id, title, description, audioUrl, duration, date }: Audi
         <span className="text-[#4A4A4A] text-sm">{formattedDuration}</span>
       </div>
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .audio-visualizer {
           display: flex;
           align-items: center;
@@ -151,7 +152,8 @@ const AudioMessage = ({ id, title, description, audioUrl, duration, date }: Audi
           border-radius: 2px;
           transition: height 0.2s ease;
         }
-      `}</style>
+        `
+      }}></style>
     </motion.div>
   );
 };

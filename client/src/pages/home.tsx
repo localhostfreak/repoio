@@ -6,8 +6,13 @@ import MemoriesSection from "@/components/MemoriesSection";
 import MessagesSection from "@/components/MessagesSection";
 import Footer from "@/components/Footer";
 
+interface LandingPage {
+  title: string;
+  message: string;
+}
+
 const Home = () => {
-  const { data: landingData } = useQuery({
+  const { data: landingData = {} as LandingPage, isLoading } = useQuery<LandingPage>({
     queryKey: ["/api/landing"],
   });
 
