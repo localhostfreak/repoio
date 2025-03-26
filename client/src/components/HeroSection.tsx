@@ -101,7 +101,12 @@ const HeroSection = ({ title, message }: HeroSectionProps) => {
               Begin Our Journey
             </button>
             <button 
-              onClick={() => document.querySelector('.createContentButton')?.click()}
+              onClick={() => {
+                const button = document.querySelector('.createContentButton');
+                if (button instanceof HTMLElement) {
+                  button.click();
+                }
+              }}
               className="bg-white text-[#FF1493] border-2 border-[#FF1493] font-medium py-3 px-8 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-pink-50"
             >
               Create a Memory

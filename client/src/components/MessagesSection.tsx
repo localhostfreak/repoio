@@ -1,10 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import AudioMessage from "./AudioMessage";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Mic } from "lucide-react";
+
+interface AudioMessageType {
+  _id: string;
+  title: string;
+  audioUrl: string;
+  description?: string;
+  duration?: number;
+  _createdAt: string;
+}
 
 const MessagesSection = () => {
-  const { data: messages = [], isLoading } = useQuery({
+  const { data: messages = [], isLoading } = useQuery<AudioMessageType[]>({
     queryKey: ["/api/audio-messages"],
   });
 
@@ -30,7 +39,7 @@ const MessagesSection = () => {
               <div key={idx} className="relative h-64 bg-gray-100 animate-pulse rounded-lg mb-8"></div>
             ))
           ) : messages.length > 0 ? (
-            messages.map((message: any) => (
+            messages.map((message) => (
               <AudioMessage 
                 key={message._id}
                 id={message._id}
@@ -42,26 +51,25 @@ const MessagesSection = () => {
               />
             ))
           ) : (
-            <>
-              {/* Default audio messages when no data is available */}
-              <AudioMessage 
-                id="1"
-                title="Good Morning Sunshine"
-                description="Starting your day with a little reminder of how much you mean to me. Listen to this whenever you miss the sound of my voice."
-                audioUrl=""
-                duration={102} // 1:42
-                date={new Date().toISOString()}
-              />
-              
-              <AudioMessage 
-                id="2"
-                title="Missing You Tonight"
-                description="The stars are out, and I'm thinking of you. Just wanted to share how my day went and hear about yours soon."
-                audioUrl=""
-                duration={138} // 2:18
-                date={new Date().toISOString()}
-              />
-            </>
+            <div className="text-center py-16 px-4 rounded-xl bg-white/50 backdrop-blur-sm shadow-sm border border-pink-100">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-pink-100 mb-4">
+                <Mic className="w-8 h-8 text-pink-500" />
+              </div>
+              <h3 className="text-xl font-dancing text-[#FF1493] mb-2">No audio messages yet</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">Record your first voice message to share sweet words, thoughts, or just to say hello when you're apart.</p>
+              <button
+                onClick={() => {
+                  const button = document.querySelector('.createContentButton');
+                  if (button instanceof HTMLElement) {
+                    button.click();
+                  }
+                }}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF6B6B] to-[#FF1493] text-white font-medium py-2 px-6 rounded-full shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <Mic className="w-4 h-4" />
+                Record Your First Message
+              </button>
+            </div>
           )}
           
           <motion.div 
@@ -72,7 +80,12 @@ const MessagesSection = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <button
-              onClick={() => document.querySelector('.createContentButton')?.click()}
+              onClick={() => {
+                const button = document.querySelector('.createContentButton');
+                if (button instanceof HTMLElement) {
+                  button.click();
+                }
+              }}
               className="inline-block bg-[#FF1493] hover:bg-[#FF6B6B] text-white font-medium py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Record a New Message
