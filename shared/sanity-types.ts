@@ -53,6 +53,7 @@ export interface LoveLetter {
   _id: string;
   title: string;
   content: any; // Rich text content
+  description?: string;
   theme?: {
     primaryColor: string;
     fontFamily: string;
@@ -73,6 +74,7 @@ export interface LoveLetter {
     openingEffect: 'fold' | 'fade' | 'butterfly' | 'hearts';
     backgroundEffect: 'particles' | 'petals' | 'stars' | 'none';
   };
+  isPrivate?: boolean; // Direct property for simpler use
 }
 
 export interface LetterExchange {
