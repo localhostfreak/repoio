@@ -411,7 +411,7 @@ app.post("/api/snaps/:id/view", async (req, res) => {
   return httpServer;
 }
 // Snap routes
-router.post('/api/snaps', async (req, res) => {
+app.post('/api/snaps', async (req, res) => {
   const { media, duration, sender } = req.body;
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); // 24hr expiry
@@ -428,14 +428,14 @@ router.post('/api/snaps', async (req, res) => {
   res.json(snap);
 });
 
-router.get('/api/snaps', async (req, res) => {
+app.get('/api/snaps', async (req, res) => {
   const snaps = await sanityClient.fetch(
     `*[_type == "snap" && !viewed && dateTime(expiresAt) > dateTime(now())]`
   );
   res.json(snaps);
 });
 
-router.put('/api/snaps/:id/view', async (req, res) => {
+app.put('/api/snaps/:id/view', async (req, res) => {
   await sanityClient
     .patch(req.params.id)
     .set({viewed: true})
