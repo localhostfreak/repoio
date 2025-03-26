@@ -136,7 +136,7 @@ export async function getGalleryItemsByTag(tag: string) {
   try {
     return await client.fetch(
       `*[_type == "galleryItem" && $tag in tags] | order(date desc)`,
-      { tag }
+      { tag: tag }
     );
   } catch (error: any) {
     console.error(`Error fetching gallery items with tag ${tag}:`, error);
@@ -219,10 +219,10 @@ export async function searchContent(query: string) {
   try {
     const searchQuery = `*[
       _type in ["loveLetter", "album", "galleryItem", "audioMessage"] &&
-      (title match $query || description match $query)
+      (title match $searchQuery || description match $searchQuery)
     ] | order(_createdAt desc)`;
     
-    return await client.fetch(searchQuery, { query: `*${query}*` });
+    return await client.fetch(searchQuery, { searchQuery: `*${query}*` });
   } catch (error: any) {
     console.error(`Error searching content with query "${query}":`, error);
     // Fallback to sample data on error
