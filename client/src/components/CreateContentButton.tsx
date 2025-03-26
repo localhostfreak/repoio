@@ -28,7 +28,7 @@ export function CreateContentButton() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="bg-pink-600 hover:bg-pink-700 text-white shadow-md fixed bottom-6 right-6 rounded-full w-14 h-14 p-0 flex items-center justify-center">
+          <Button className="createContentButton bg-pink-600 hover:bg-pink-700 text-white shadow-md fixed bottom-6 right-6 rounded-full w-14 h-14 p-0 flex items-center justify-center">
             <PlusCircle className="h-8 w-8" />
           </Button>
         </DropdownMenuTrigger>

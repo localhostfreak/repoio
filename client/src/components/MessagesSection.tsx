@@ -71,16 +71,18 @@ const MessagesSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <Link href="/record">
-              <a className="inline-block bg-[#FF1493] hover:bg-[#FF6B6B] text-white font-medium py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Record a New Message
-              </a>
-            </Link>
+            <button
+              onClick={() => document.querySelector('.createContentButton')?.click()}
+              className="inline-block bg-[#FF1493] hover:bg-[#FF6B6B] text-white font-medium py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Record a New Message
+            </button>
           </motion.div>
         </div>
       </div>
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes pulse-slow {
           0%, 100% { opacity: 0.1; transform: scale(1); }
           50% { opacity: 0.2; transform: scale(1.05); }
@@ -89,7 +91,8 @@ const MessagesSection = () => {
         .animate-pulse-slow {
           animation: pulse-slow 4s ease-in-out infinite;
         }
-      `}</style>
+        `
+      }}></style>
     </section>
   );
 };

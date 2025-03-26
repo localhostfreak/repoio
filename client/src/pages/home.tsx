@@ -23,7 +23,8 @@ const Home = () => {
       <MessagesSection />
       <Footer />
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-20px); }
@@ -99,7 +100,8 @@ const Home = () => {
             scroll-behavior: auto !important;
           }
         }
-      `}</style>
+        `
+      }}></style>
     </div>
   );
 };
