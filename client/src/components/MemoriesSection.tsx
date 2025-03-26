@@ -3,140 +3,184 @@ import AlbumCard from "./AlbumCard";
 import GalleryItem from "./GalleryItem";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { Camera, FolderHeart } from "lucide-react";
+
+interface Album {
+  _id: string;
+  title: string;
+  description?: string;
+  coverImage?: string;
+  itemsCount?: number;
+  _createdAt?: string;
+}
+
+interface GalleryItemType {
+  _id: string;
+  title: string;
+  thumbnailUrl?: string;
+  mediaUrl: string;
+  reactions?: Array<{ emoji: string; count: number }>;
+}
 
 const MemoriesSection = () => {
-  const { data: albums = [], isLoading: albumsLoading } = useQuery({
+  // Type-safe queries
+  const { data: albumsData, isLoading: albumsLoading, isError: albumsError } = useQuery<Album[]>({
     queryKey: ["/api/albums"],
+    select: (data) => {
+      if (!data) return [];
+      if (!Array.isArray(data)) return [data as any];
+      return data;
+    }
   });
 
-  const { data: featuredItems = [], isLoading: itemsLoading } = useQuery({
+  const { data: featuredItemsData, isLoading: itemsLoading, isError: itemsError } = useQuery<GalleryItemType[]>({
     queryKey: ["/api/gallery/featured"],
+    select: (data) => {
+      if (!data) return [];
+      if (!Array.isArray(data)) return [data as any];
+      return data;
+    }
   });
+
+  // Safe access to data
+  const albums = albumsData || [];
+  const featuredItems = featuredItemsData || [];
 
   return (
-    <section id="memories" className="py-20 bg-white relative">
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#FFF5F5] to-white"></div>
+    <section id="memories-section" className="py-20 relative">
+      {/* Background gradient */}
+      <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-pink-900/5 to-transparent"></div>
       
       <div className="container mx-auto px-4">
-        <motion.h2 
-          className="text-4xl font-playfair text-[#FF6B6B] text-center mb-16"
+        <motion.div 
+          className="flex items-center justify-center mb-16 gap-3"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          Our Memories
-        </motion.h2>
+          <FolderHeart className="text-pink-500 w-8 h-8" />
+          <h2 className="text-4xl handwritten text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600 text-center">
+            Our Memories
+          </h2>
+        </motion.div>
         
         {/* Albums List */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {albumsLoading ? (
+            // Loading skeletons
             Array(3).fill(0).map((_, idx) => (
-              <div key={idx} className="relative h-80 bg-gray-100 animate-pulse rounded-lg"></div>
+              <div key={idx} className="relative h-80 bg-gray-800/50 animate-pulse rounded-lg"></div>
             ))
+          ) : albumsError ? (
+            <div className="col-span-3 text-center py-8 glass-effect rounded-xl p-8">
+              <p className="text-pink-300">Unable to fetch albums. Our memories are there, just momentarily hidden.</p>
+            </div>
           ) : albums.length > 0 ? (
-            albums.map((album: any) => (
-              <AlbumCard 
+            // Display albums if available
+            albums.map((album: Album) => (
+              <motion.div
                 key={album._id}
-                id={album._id}
-                title={album.title}
-                description={album.description}
-                coverImage={album.coverImage}
-                itemsCount={album.itemsCount}
-                date={album._createdAt ? format(new Date(album._createdAt), "MMMM d, yyyy") : undefined}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <AlbumCard 
+                  id={album._id}
+                  title={album.title}
+                  description={album.description || ""}
+                  coverImage={album.coverImage || ""}
+                  itemsCount={album.itemsCount || 0}
+                  date={album._createdAt ? 
+                    format(new Date(album._createdAt), "MMMM d, yyyy") : 
+                    undefined}
+                />
+              </motion.div>
             ))
           ) : (
-            <>
-              {/* Default album examples when no data is available */}
-              <AlbumCard 
-                id="1"
-                title="First Date"
-                description="That magical evening when we first met. The cafe, the unexpected rain, and the beginning of our journey together."
-                coverImage="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                itemsCount={12}
-                date="April 15, 2022"
-              />
-              
-              <AlbumCard 
-                id="2"
-                title="Our Vacation"
-                description="Two weeks of pure bliss exploring the coastline, watching sunsets, and falling even deeper in love."
-                coverImage="https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                itemsCount={24}
-                date="July 12, 2022"
-              />
-              
-              <AlbumCard 
-                id="3"
-                title="Anniversary"
-                description="Celebrating one year of us with a surprise dinner, dancing under the stars, and promises for the future."
-                coverImage="https://images.unsplash.com/photo-1522673607200-164d1b3ce551?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                itemsCount={18}
-                date="April 15, 2023"
-              />
-            </>
+            // Empty state with call-to-action
+            <div className="col-span-3 love-card text-center py-8">
+              <p className="text-gray-300 mb-4">Create your first photo album to start collecting your special memories.</p>
+              <button 
+                onClick={() => {
+                  const button = document.querySelector('.createContentButton');
+                  if (button instanceof HTMLElement) {
+                    button.click();
+                  }
+                }}
+                className="love-button mt-4"
+              >
+                Create Album
+              </button>
+            </div>
           )}
         </div>
         
         {/* Featured Gallery Items */}
         <div className="mt-20">
-          <motion.h3 
-            className="text-2xl font-playfair text-[#FF1493] text-center mb-10"
+          <motion.div 
+            className="flex items-center justify-center mb-10 gap-2"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            Featured Moments
-          </motion.h3>
+            <Camera className="text-pink-500 w-6 h-6" />
+            <h3 className="text-2xl handwritten text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-pink-600 text-center">
+              Featured Moments
+            </h3>
+          </motion.div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {itemsLoading ? (
+              // Loading skeletons
               Array(4).fill(0).map((_, idx) => (
-                <div key={idx} className="relative aspect-square bg-gray-100 animate-pulse rounded-lg"></div>
+                <div key={idx} className="relative aspect-square bg-gray-800/50 animate-pulse rounded-lg"></div>
               ))
+            ) : itemsError ? (
+              <div className="col-span-4 text-center py-8 glass-effect rounded-xl p-6">
+                <p className="text-pink-300">Unable to load featured moments. Our gallery will be back soon.</p>
+              </div>
             ) : featuredItems.length > 0 ? (
-              featuredItems.map((item: any) => (
-                <GalleryItem 
+              // Display gallery items if available
+              featuredItems.map((item: GalleryItemType, index) => (
+                <motion.div
                   key={item._id}
-                  id={item._id}
-                  title={item.title}
-                  imageUrl={item.thumbnailUrl || item.mediaUrl}
-                  reactionCount={item.reactions?.reduce((sum: number, reaction: any) => sum + reaction.count, 0) || 0}
-                />
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="mobile-tilt"
+                >
+                  <GalleryItem 
+                    id={item._id}
+                    title={item.title || "Special Moment"}
+                    imageUrl={item.thumbnailUrl || item.mediaUrl}
+                    reactionCount={
+                      item.reactions?.reduce(
+                        (sum: number, reaction: any) => sum + (reaction.count || 0), 0
+                      ) || 0
+                    }
+                  />
+                </motion.div>
               ))
             ) : (
-              <>
-                {/* Default gallery items when no data is available */}
-                <GalleryItem 
-                  id="1"
-                  title="Sunset Beach Walk"
-                  imageUrl="https://images.unsplash.com/photo-1530653333484-8e3c89cd2f45?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                  reactionCount={12}
-                />
-                
-                <GalleryItem 
-                  id="2"
-                  title="Coffee Shop Date"
-                  imageUrl="https://images.unsplash.com/photo-1518911710364-17ec553bde5d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                  reactionCount={8}
-                />
-                
-                <GalleryItem 
-                  id="3"
-                  title="Picnic in the Park"
-                  imageUrl="https://images.unsplash.com/photo-1523301551780-cd17359a95d0?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                  reactionCount={15}
-                />
-                
-                <GalleryItem 
-                  id="4"
-                  title="Stargazing Night"
-                  imageUrl="https://images.unsplash.com/photo-1593239782798-5027b7623c59?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                  reactionCount={21}
-                />
-              </>
+              // Empty state with call-to-action
+              <div className="col-span-4 love-card text-center py-8">
+                <p className="text-gray-300 mb-4">Your gallery is waiting for your first special moment.</p>
+                <button 
+                  onClick={() => {
+                    const button = document.querySelector('.createContentButton');
+                    if (button instanceof HTMLElement) {
+                      button.click();
+                    }
+                  }}
+                  className="love-button mt-4"
+                >
+                  Upload Memory
+                </button>
+              </div>
             )}
           </div>
         </div>

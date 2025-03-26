@@ -4,12 +4,27 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Heart, PenTool } from "lucide-react";
 
+interface Letter {
+  _id: string;
+  title: string;
+  content: any;
+  _createdAt?: string;
+  createdAt?: string;
+}
+
 const LoveLettersSection = () => {
-  const { data: letters = [], isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<Letter[]>({
     queryKey: ["/api/love-letters"],
+    select: (data) => {
+      // Ensure data is always an array
+      if (!data) return [];
+      if (!Array.isArray(data)) return [data as any];
+      return data;
+    }
   });
 
-  console.log("Love Letters Data:", letters);
+  // Safe accessing the letters data
+  const letters = data || [];
 
   return (
     <section id="love-letters" className="py-20 relative overflow-hidden">
@@ -39,15 +54,18 @@ const LoveLettersSection = () => {
         
         <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           {isLoading ? (
+            // Loading skeletons
             Array(2).fill(0).map((_, idx) => (
               <div key={idx} className="relative h-96 bg-gray-800/50 animate-pulse rounded-lg"></div>
             ))
           ) : isError ? (
+            // Error state
             <div className="col-span-2 text-center py-8 glass-effect rounded-xl p-8">
               <p className="text-pink-300">Unable to fetch love letters. Don't worry, our connection is still strong.</p>
             </div>
-          ) : letters && letters.length > 0 ? (
-            letters.map((letter: any) => (
+          ) : letters.length > 0 ? (
+            // Display letters if available
+            letters.map((letter: Letter) => (
               <motion.div
                 key={letter._id}
                 initial={{ opacity: 0, y: 20 }}
@@ -68,6 +86,7 @@ const LoveLettersSection = () => {
               </motion.div>
             ))
           ) : (
+            // Empty state with call-to-action
             <div className="col-span-2 love-card text-center py-8">
               <p className="text-gray-300">Our love story is just beginning. Create the first love letter to express your feelings.</p>
               <button 
@@ -85,7 +104,7 @@ const LoveLettersSection = () => {
           )}
         </div>
         
-        {letters && letters.length > 0 && (
+        {letters.length > 0 && (
           <motion.div 
             className="text-center mt-16"
             initial={{ opacity: 0 }}
