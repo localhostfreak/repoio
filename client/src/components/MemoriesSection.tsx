@@ -190,35 +190,35 @@ const MemoriesSection = () => {
 };
 
 export default MemoriesSection;
-import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { Album } from "../../shared/sanity-types";
-import AlbumCard from "./AlbumCard";
+// import { useQuery } from "@tanstack/react-query";
+// import { motion } from "framer-motion";
+// import { Album } from "../../shared/sanity-types";
+// import AlbumCard from "./AlbumCard";
 
-export default function MemoriesSection() {
-  const { data: albums } = useQuery<Album[]>({
-    queryKey: ["/api/albums"],
-    select: (data) => data || []
-  });
+// export default function MemoriesSection() {
+//   const { data: albums } = useQuery<Album[]>({
+//     queryKey: ["/api/albums"],
+//     select: (data) => data || []
+//   });
 
-  return (
-    <section className="py-16 px-4">
-      <motion.div 
-        className="container mx-auto"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-      >
-        <h2 className="text-3xl md:text-4xl font-playfair text-center mb-12 text-pink-400">
-          Our Precious Memories
-        </h2>
+//   return (
+//     <section className="py-16 px-4">
+//       <motion.div 
+//         className="container mx-auto"
+//         initial={{ opacity: 0 }}
+//         whileInView={{ opacity: 1 }}
+//         viewport={{ once: true }}
+//       >
+//         <h2 className="text-3xl md:text-4xl font-playfair text-center mb-12 text-pink-400">
+//           Our Precious Memories
+//         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {albums?.map((album) => (
-            <AlbumCard key={album._id} album={album} />
-          ))}
-        </div>
-      </motion.div>
-    </section>
-  );
-}
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {albums?.map((album) => (
+//             <AlbumCard key={album._id} album={album} />
+//           ))}
+//         </div>
+//       </motion.div>
+//     </section>
+//   );
+// }

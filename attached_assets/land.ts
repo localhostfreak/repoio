@@ -1,4 +1,20 @@
-import { defineField, defineType } from "sanity";
+import { motion } from "framer-motion";
+import { Album } from "../../shared/sanity-types";
+import AlbumCard from "./AlbumCard"; // Ensure this line appears only once
+
+export default function MemoriesSection() {
+  const { data: albums } = useQuery<Album[]>({
+    // Your query logic here
+  });
+
+  return (
+    <div>
+      {albums?.map(album => (
+        <AlbumCard key={album.id} album={album} />
+      ))}
+    </div>
+  );
+}import { defineField, defineType } from "sanity";
 
 export const landingSchema = defineType({
   name: "landing",
