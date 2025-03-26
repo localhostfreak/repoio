@@ -9,6 +9,11 @@ interface AlbumCardProps {
 }
 
 const AlbumCard = ({ album }: AlbumCardProps) => {
+  // Handle case where album is undefined
+  if (!album) {
+    return <div className="rounded-lg p-4 bg-gray-800 text-gray-400">Album data not available</div>;
+  }
+  
   // Default placeholder image if no cover image is provided
   const defaultCover = "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
   
