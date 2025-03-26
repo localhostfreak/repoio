@@ -359,7 +359,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // -------------- RECENT CONTENT API --------------
+  // -------------- SNAPS API --------------
+
+app.post("/api/snaps", async (req, res) => {
+  try {
+    const newSnap = await createSnap(req.body);
+    res.status(201).json(newSnap);
+  } catch (error) {
+    console.error("Error creating snap:", error);
+    res.status(500).json({ message: "Error creating snap" });
+  }
+});
+
+app.get("/api/snaps/:userId", async (req, res) => {
+  try {
+    const snaps = await getSnapsByUser(req.params.userId);
+    res.json(snaps);
+  } catch (error) {
+    console.error("Error fetching snaps:", error);
+    res.status(500).json({ message: "Error fetching snaps" });
+  }
+});
+
+app.post("/api/snaps/:id/view", async (req, res) => {
+  try {
+    await markSnapAsViewed(req.params.id);
+    res.status(200).end();
+  } catch (error) {
+    console.error("Error marking snap as viewed:", error);
+    res.status(500).json({ message: "Error marking snap as viewed" });
+  }
+});
+
+// -------------- RECENT CONTENT API --------------
   
   // Get recent content across all types
   app.get("/api/recent", async (req, res) => {

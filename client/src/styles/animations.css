@@ -1,0 +1,40 @@
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes disperse {
+  0% { filter: blur(0); transform: scale(1); }
+  100% { filter: blur(10px); transform: scale(1.2); opacity: 0; }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.heart-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  transform-style: preserve-3d;
+}
+
+.heart {
+  font-size: 5rem;
+  color: #ff1493;
+  filter: drop-shadow(0 0 10px rgba(255, 20, 147, 0.5));
+}

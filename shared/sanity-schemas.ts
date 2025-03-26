@@ -295,6 +295,46 @@ export const galleryItemSchema = defineType({
 });
 
 // Audio Message schema
+export const snapSchema = defineType({
+  name: "snap",
+  title: "Snap",
+  type: "document",
+  fields: [
+    defineField({
+      name: "sender",
+      title: "Sender",
+      type: "reference",
+      to: [{ type: "user" }],
+      validation: (Rule) => Rule.required()
+    }),
+    defineField({
+      name: "media",
+      title: "Media",
+      type: "image",
+      options: {
+        hotspot: true
+      }
+    }),
+    defineField({
+      name: "duration",
+      title: "Duration",
+      type: "number",
+      validation: (Rule) => Rule.min(1).max(10)
+    }),
+    defineField({
+      name: "expiresAt",
+      title: "Expires At",
+      type: "datetime"
+    }),
+    defineField({
+      name: "viewed",
+      title: "Viewed",
+      type: "boolean",
+      initialValue: false
+    })
+  ]
+});
+
 export const audioMessageSchema = defineType({
   name: "audioMessage",
   title: "Audio Message",
