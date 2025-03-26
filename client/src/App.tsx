@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import HeartBackground from "./components/HeartBackground";
+import CreateContentButton from "./components/CreateContentButton";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function App() {
     <>
       <HeartBackground />
       <Router />
+      <CreateContentButton />
       <Toaster />
     </>
   );
