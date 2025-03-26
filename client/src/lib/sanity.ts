@@ -1,13 +1,25 @@
 import { createClient } from '@sanity/client';
 
-// Configure Sanity client with environment variables or defaults for development
+// Handle environment variables safely
+const projectId = typeof import.meta.env !== 'undefined' ? 
+  import.meta.env.VITE_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || 'development' : 
+  'development';
+
+const dataset = typeof import.meta.env !== 'undefined' ? 
+  import.meta.env.VITE_SANITY_DATASET || process.env.SANITY_DATASET || 'production' : 
+  'production';
+
+const token = typeof import.meta.env !== 'undefined' ? 
+  import.meta.env.VITE_SANITY_TOKEN || process.env.SANITY_TOKEN || '' : 
+  '';
+
+// Configure Sanity client with environment variables
 export const client = createClient({
-  projectId: 'development',
-  dataset: 'production',
+  projectId,
+  dataset,
   useCdn: true,
   apiVersion: '2023-05-03',
-  // We'll handle authentication when we have proper credentials
-  token: ''
+  token
 });
 
 // Queries

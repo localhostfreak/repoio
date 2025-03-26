@@ -23,16 +23,17 @@ import {
   getGalleryItemsByTag as getItemsByTag
 } from './sample-data';
 
-// Create a Sanity client for development/testing
+// Create a Sanity client with proper credentials
 const client = createClient({
-  projectId: 'development',
-  dataset: 'production',
-  useCdn: false,
+  projectId: process.env.SANITY_PROJECT_ID || '',
+  dataset: process.env.SANITY_DATASET || 'production',
+  useCdn: process.env.NODE_ENV === 'production',
+  token: process.env.SANITY_TOKEN,
   apiVersion: '2023-05-03',
 });
 
 // Flag to control whether to use sample data or try Sanity connections
-const USE_SAMPLE_DATA = true;
+const USE_SAMPLE_DATA = false;
 
 // Enhanced functions with better error handling and features
 
