@@ -1,26 +1,46 @@
 import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
+import groq from 'groq';
 
-// Handle environment variables safely
-const projectId = typeof import.meta.env !== 'undefined' ? 
-  import.meta.env.VITE_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || 'development' : 
-  'development';
+// Add groq export
+export { groq };
 
-const dataset = typeof import.meta.env !== 'undefined' ? 
-  import.meta.env.VITE_SANITY_DATASET || process.env.SANITY_DATASET || 'production' : 
-  'production';
+if (!import.meta.env.VITE_SANITY_PROJECT_ID) {
+  throw new Error('Missing VITE_SANITY_PROJECT_ID environment variable');
+}
 
-const token = typeof import.meta.env !== 'undefined' ? 
-  import.meta.env.VITE_SANITY_TOKEN || process.env.SANITY_TOKEN || '' : 
-  '';
-
-// Configure Sanity client with environment variables
+// Simplified client configuration
 export const client = createClient({
-  projectId,
-  dataset,
-  useCdn: true,
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
+  dataset: import.meta.env.VITE_SANITY_DATASET || 'production',
   apiVersion: '2023-05-03',
-  token
+  token: import.meta.env.VITE_SANITY_TOKEN,
+  useCdn: false
 });
+
+// Simplified query helper
+export async function fetchSanityQuery<T>(query: string, params = {}): Promise<T> {
+  return client.fetch(query, params);
+}
+
+export const builder = imageUrlBuilder(client);
+
+export function urlFor(source: any) {
+  return builder.image(source);
+}
+
+// Add this utility function
+export async function uploadAudioToSanity(audioFile: File) {
+  try {
+    return await client.assets.upload('file', audioFile, {
+      contentType: audioFile.type,
+      filename: audioFile.name
+    });
+  } catch (error) {
+    console.error('Sanity upload error:', error);
+    throw new Error('Failed to upload audio file to Sanity');
+  }
+}
 
 // Queries
 export const getLettersQuery = `*[_type == "loveLetter"] | order(createdAt desc) {
@@ -62,13 +82,25 @@ export const getLandingPageQuery = `*[_type == "landing"][0] {
   message
 }`;
 
+// Update the audio messages query to include all fields
 export const getAudioMessagesQuery = `*[_type == "audioMessage"] | order(_createdAt desc) {
   _id,
   title,
-  "audioUrl": audioFile.asset->url,
+  audioFile {
+    asset-> {
+      url,
+      _id,
+      _ref
+    }
+  },
   caption,
   description,
+  mood,
   duration,
+  isPrivate,
+  visualizer,
+  reactions,
+  background,
   _createdAt
 }`;
 

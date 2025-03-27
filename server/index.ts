@@ -1,6 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { validateEnv } from './lib/validate-env';
+import dotenv from 'dotenv';
+// Add this new import
+import os from 'os';
+
+// Load environment variables
+dotenv.config();
+
+// Validate environment variables before starting
+validateEnv();
 
 const app = express();
 app.use(express.json());
@@ -36,35 +46,46 @@ app.use((req, res, next) => {
   next();
 });
 
+// Add configuration for network access
+const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
+
 (async () => {
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
+    console.error(err);
     res.status(status).json({ message });
-    throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
   server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
+    port: PORT,
+    host: HOST,
   }, () => {
-    log(`serving on port ${port}`);
+    // Changed from require('os') to using imported os
+    const networkInterfaces = os.networkInterfaces();
+    const addresses = [];
+    for (const k in networkInterfaces) {
+      for (const k2 in networkInterfaces[k]) {
+        const address = networkInterfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+          addresses.push(address.address);
+        }
+      }
+    }
+
+    log(`Server running on:`);
+    log(`- Local:   http://localhost:${PORT}`);
+    addresses.forEach(addr => {
+      log(`- Network: http://${addr}:${PORT}`);
+    });
   });
 })();

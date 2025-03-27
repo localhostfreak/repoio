@@ -1,20 +1,8 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { 
-  getLetters, 
-  getAlbums, 
-  getGalleryItems, 
-  getLandingData,
-  getAudioMessages,
-  getFeaturedItems,
-  getLoveLetter,
-  getAudioMessage,
-  getAlbumWithItems,
-  getGalleryItemsByTag,
-  searchContent,
-  getRecentContent
-} from "./lib/sanity";
+import { sanityAPI } from "./lib/sanity";
+import { dataProvider } from "../client/src/lib/dataProvider";
 
 // Import create/update/delete functions
 import {
@@ -38,7 +26,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get landing page data
   app.get("/api/landing", async (req, res) => {
     try {
-      const landingData = await getLandingData();
+      const landingData = await sanityAPI.getLandingData();
       res.json(landingData);
     } catch (error) {
       console.error("Error fetching landing data:", error);
@@ -51,7 +39,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all love letters
   app.get("/api/love-letters", async (req, res) => {
     try {
-      const letters = await getLetters();
+      // Use dataProvider instead of direct sanityAPI call
+      const letters = await dataProvider.getLetters();
       res.json(letters);
     } catch (error) {
       console.error("Error fetching love letters:", error);
@@ -62,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get love letter by ID
   app.get("/api/love-letters/:id", async (req, res) => {
     try {
-      const letter = await getLoveLetter(req.params.id);
+      const letter = await sanityAPI.getLoveLetter(req.params.id);
       if (!letter) {
         return res.status(404).json({ message: "Love letter not found" });
       }
@@ -122,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all albums
   app.get("/api/albums", async (req, res) => {
     try {
-      const albums = await getAlbums();
+      const albums = await sanityAPI.getAlbums();
       res.json(albums);
     } catch (error) {
       console.error("Error fetching albums:", error);
@@ -133,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get album by ID with all its items
   app.get("/api/albums/:id", async (req, res) => {
     try {
-      const album = await getAlbumWithItems(req.params.id);
+      const album = await sanityAPI.getAlbumWithItems(req.params.id);
       if (!album) {
         return res.status(404).json({ message: "Album not found" });
       }
@@ -182,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all gallery items
   app.get("/api/gallery", async (req, res) => {
     try {
-      const galleryItems = await getGalleryItems();
+      const galleryItems = await sanityAPI.getGalleryItems();
       res.json(galleryItems);
     } catch (error) {
       console.error("Error fetching gallery items:", error);
@@ -193,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get gallery items by tag
   app.get("/api/gallery/tag/:tag", async (req, res) => {
     try {
-      const items = await getGalleryItemsByTag(req.params.tag);
+      const items = await sanityAPI.getGalleryItemsByTag(req.params.tag);
       res.json(items);
     } catch (error) {
       console.error(`Error fetching gallery items with tag ${req.params.tag}:`, error);
@@ -204,7 +193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get featured gallery items
   app.get("/api/gallery/featured", async (req, res) => {
     try {
-      const featuredItems = await getFeaturedItems();
+      const featuredItems = await sanityAPI.getFeaturedItems();
       res.json(featuredItems);
     } catch (error) {
       console.error("Error fetching featured items:", error);
@@ -287,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all audio messages
   app.get("/api/audio-messages", async (req, res) => {
     try {
-      const audioMessages = await getAudioMessages();
+      const audioMessages = await sanityAPI.getAudioMessages();
       res.json(audioMessages);
     } catch (error) {
       console.error("Error fetching audio messages:", error);
@@ -298,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get audio message by ID
   app.get("/api/audio-messages/:id", async (req, res) => {
     try {
-      const message = await getAudioMessage(req.params.id);
+      const message = await sanityAPI.getAudioMessage(req.params.id);
       if (!message) {
         return res.status(404).json({ message: "Audio message not found" });
       }
@@ -351,7 +340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!query) {
         return res.status(400).json({ message: "Search query is required" });
       }
-      const results = await searchContent(query);
+      const results = await sanityAPI.searchContent(query);
       res.json(results);
     } catch (error) {
       console.error(`Error searching content with query "${req.query.q}":`, error);
@@ -397,7 +386,7 @@ app.post("/api/snaps/:id/view", async (req, res) => {
   app.get("/api/recent", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-      const recentContent = await getRecentContent(limit);
+      const recentContent = await sanityAPI.getRecentContent(limit);
       res.json(recentContent);
     } catch (error) {
       console.error("Error fetching recent content:", error);

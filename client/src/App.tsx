@@ -4,6 +4,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import HeartBackground from "./components/HeartBackground";
 import CreateContentButton from "./components/CreateContentButton";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 function Router() {
   return (
@@ -16,11 +17,12 @@ function Router() {
 
 function App() {
   return (
-    <>
+    <><TooltipProvider>
       <HeartBackground />
       <Router />
       <CreateContentButton />
       <Toaster />
+      </TooltipProvider>
     </>
   );
 }

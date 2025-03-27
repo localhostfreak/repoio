@@ -1,0 +1,30 @@
+.message-card {
+  @apply relative overflow-hidden rounded-lg transition-all duration-300;
+}
+
+.message-card:hover {
+  @apply transform -translate-y-1 shadow-xl;
+}
+
+.message-grid {
+  @apply grid auto-rows-max gap-4;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.audio-controls {
+  @apply flex items-center gap-2 p-2 rounded-lg bg-opacity-50 backdrop-blur-sm;
+}
+
+.visualizer {
+  @apply absolute inset-0 pointer-events-none opacity-50;
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  mask-image: linear-gradient(to bottom, transparent, black);
+}
+
+.dark .message-card {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .audio-controls {
+  @apply bg-gray-900 bg-opacity-75;
+}

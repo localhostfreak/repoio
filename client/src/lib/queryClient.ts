@@ -11,9 +11,21 @@ export async function apiRequest(
   url: string,
   options?: RequestInit
 ): Promise<Response> {
+  const defaultOptions = {
+    credentials: 'include' as RequestCredentials,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${import.meta.env.VITE_SANITY_TOKEN}`,
+    },
+  };
+
   const res = await fetch(url, {
-    credentials: "include",
-    ...options
+    ...defaultOptions,
+    ...options,
+    headers: {
+      ...defaultOptions.headers,
+      ...(options as any).headers,
+    },
   });
 
   await throwIfResNotOk(res);
@@ -44,8 +56,8 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
     },
     mutations: {
       retry: false,

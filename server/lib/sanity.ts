@@ -1,268 +1,220 @@
 import { createClient } from '@sanity/client';
-import {
-  getLettersQuery,
-  getAlbumsQuery,
-  getGalleryItemsQuery,
-  getLandingPageQuery,
-  getAudioMessagesQuery,
-  getFeaturedItemsQuery
-} from '../../client/src/lib/sanity';
-import { schemas } from './schema';
-import {
-  sampleLetters,
-  sampleAlbums,
-  sampleGalleryItems,
-  sampleAudioMessages,
-  sampleLandingPage,
-  sampleBirthdayCards,
-  generateSearchResults,
-  generateRecentContent,
-  getFeaturedGalleryItems,
-  getItemById,
-  getAlbumWithContents,
-  getGalleryItemsByTag as getItemsByTag
-} from './sample-data';
+import dotenv from 'dotenv';
 
-// Create a Sanity client with proper credentials
-const client = createClient({
-  projectId: process.env.SANITY_PROJECT_ID || '',
-  dataset: process.env.SANITY_DATASET || 'production',
+// Load environment variables
+dotenv.config();
+
+if (!process.env.SANITY_PROJECT_ID) {
+  throw new Error('SANITY_PROJECT_ID environment variable is not set');
+}
+
+if (!process.env.SANITY_DATASET) {
+  throw new Error('SANITY_DATASET environment variable is not set');
+}
+
+const config = {
+  projectId: process.env.SANITY_PROJECT_ID,
+  dataset: process.env.SANITY_DATASET,
   useCdn: process.env.NODE_ENV === 'production',
   token: process.env.SANITY_TOKEN,
-  apiVersion: '2023-05-03',
-});
+  apiVersion: '2024-03-15'
+};
 
-// Flag to control whether to use sample data or try Sanity connections
-const USE_SAMPLE_DATA = false;
+// Create a single instance of the client
+export const client = createClient(config);
 
-// Enhanced functions with better error handling and features
+// Only deduplicate concurrent requests, don't cache
+const inFlightRequests = new Map();
 
-// Fetch love letters with additional capabilities
-export async function getLetters() {
-  if (USE_SAMPLE_DATA) {
-    return sampleLetters;
+const originalFetch = client.fetch.bind(client);
+client.fetch = async (...args) => {
+  const key = JSON.stringify(args);
+  
+  if (inFlightRequests.has(key)) {
+    return inFlightRequests.get(key);
   }
   
-  try {
-    return await client.fetch(getLettersQuery);
-  } catch (error: any) {
-    console.error('Error fetching love letters:', error);
-    // Fallback to sample data on error
-    return sampleLetters;
-  }
-}
-
-// Get a single love letter by ID
-export async function getLoveLetter(id: string) {
-  if (USE_SAMPLE_DATA) {
-    const letter = getItemById('loveLetter', id);
-    return letter || null;
-  }
+  const promise = originalFetch(...args).finally(() => {
+    // Clean up immediately after request completes
+    inFlightRequests.delete(key);
+  });
   
-  try {
-    return await client.fetch(
-      `*[_type == "loveLetter" && _id == $id][0]`,
-      { id }
-    );
-  } catch (error: any) {
-    console.error(`Error fetching love letter with ID ${id}:`, error);
-    // Fallback to sample data on error
-    return getItemById('loveLetter', id);
-  }
-}
+  inFlightRequests.set(key, promise);
+  return promise;
+};
 
-// Fetch albums with filter capabilities
-export async function getAlbums(options = {}) {
-  if (USE_SAMPLE_DATA) {
-    return sampleAlbums;
-  }
-  
-  try {
-    const identity = process.env.SANITY_USER_ID || '';
-    const params = { identity, ...options };
-    return await client.fetch(getAlbumsQuery, params);
-  } catch (error: any) {
-    console.error('Error fetching albums:', error);
-    // Fallback to sample data on error
-    return sampleAlbums;
-  }
-}
+// Export a single queries object
+export const queries = {
+  getLetters: '*[_type == "loveLetter"]',
+  getAlbums: '*[_type == "album"]',
+  getGalleryItems: '*[_type == "galleryItem"]',
+  getLandingPage: '*[_type == "landingPage"][0]',
+  getAudioMessages: '*[_type == "audioMessage"]',
+  getFeaturedItems: '*[_type == "galleryItem" && featured == true]',
+};
 
-// Get a single album by ID with all its items
-export async function getAlbumWithItems(id: string) {
-  if (USE_SAMPLE_DATA) {
-    return getAlbumWithContents(id);
-  }
-  
-  try {
-    const album = await client.fetch(
-      `*[_type == "album" && _id == $id][0] {
-        ...,
-        "items": *[_type == "galleryItem" && references($id)]
-      }`,
-      { id }
-    );
-    return album;
-  } catch (error: any) {
-    console.error(`Error fetching album with ID ${id}:`, error);
-    // Fallback to sample data on error
-    return getAlbumWithContents(id);
-  }
-}
+// Remove duplicate function declarations and simplify exports
+export const sanityAPI = {
+  // Fetch love letters
+  getLetters: async () => {
+    try {
+      return await client.fetch(queries.getLetters);
+    } catch (error: any) {
+      console.error('Error fetching love letters:', error);
+      throw error;
+    }
+  },
 
-// Fetch gallery items with filtering options
-export async function getGalleryItems(options = {}) {
-  if (USE_SAMPLE_DATA) {
-    return sampleGalleryItems;
-  }
-  
-  try {
-    const identity = process.env.SANITY_USER_ID || '';
-    const params = { identity, ...options };
-    return await client.fetch(getGalleryItemsQuery, params);
-  } catch (error: any) {
-    console.error('Error fetching gallery items:', error);
-    // Fallback to sample data on error
-    return sampleGalleryItems;
-  }
-}
+  // Get single love letter by ID
+  getLoveLetter: async (id: string) => {
+    try {
+      return await client.fetch(
+        `*[_type == "loveLetter" && _id == $id][0]`,
+        { id }
+      );
+    } catch (error: any) {
+      console.error(`Error fetching love letter with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-// Fetch gallery items by tag
-export async function getGalleryItemsByTag(tag: string) {
-  if (USE_SAMPLE_DATA) {
-    return getItemsByTag(tag);
-  }
-  
-  try {
-    return await client.fetch(
-      `*[_type == "galleryItem" && $tag in tags] | order(date desc)`,
-      { tag: tag }
-    );
-  } catch (error: any) {
-    console.error(`Error fetching gallery items with tag ${tag}:`, error);
-    // Fallback to sample data on error
-    return getItemsByTag(tag);
-  }
-}
+  // Fetch albums
+  getAlbums: async (options = {}) => {
+    try {
+      const identity = process.env.SANITY_USER_ID || '';
+      const params = { identity, ...options };
+      return await client.fetch(queries.getAlbums, params);
+    } catch (error: any) {
+      console.error('Error fetching albums:', error);
+      throw error;
+    }
+  },
 
-// Fetch featured gallery items
-export async function getFeaturedItems() {
-  if (USE_SAMPLE_DATA) {
-    return getFeaturedGalleryItems();
-  }
-  
-  try {
-    return await client.fetch(getFeaturedItemsQuery);
-  } catch (error: any) {
-    console.error('Error fetching featured items:', error);
-    // Fallback to sample data on error
-    return getFeaturedGalleryItems();
-  }
-}
+  // Get a single album by ID with all its items
+  getAlbumWithItems: async (id: string) => {
+    try {
+      const album = await client.fetch(
+        `*[_type == "album" && _id == $id][0] {
+          ...,
+          "items": *[_type == "galleryItem" && references($id)]
+        }`,
+        { id }
+      );
+      return album;
+    } catch (error: any) {
+      console.error(`Error fetching album with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
-// Fetch landing page data
-export async function getLandingData() {
-  if (USE_SAMPLE_DATA) {
-    return sampleLandingPage;
-  }
-  
-  try {
-    return await client.fetch(getLandingPageQuery);
-  } catch (error: any) {
-    console.error('Error fetching landing data:', error);
-    // Fallback to sample data on error
-    return sampleLandingPage;
-  }
-}
+  // Fetch gallery items with filtering options
+  getGalleryItems: async (options = {}) => {
+    try {
+      const identity = process.env.SANITY_USER_ID || '';
+      const params = { identity, ...options };
+      return await client.fetch(queries.getGalleryItems, params);
+    } catch (error: any) {
+      console.error('Error fetching gallery items:', error);
+      throw error;
+    }
+  },
 
-// Fetch audio messages with filtering capabilities
-export async function getAudioMessages(options = {}) {
-  if (USE_SAMPLE_DATA) {
-    return sampleAudioMessages;
-  }
-  
-  try {
-    const params = { ...options };
-    return await client.fetch(getAudioMessagesQuery, params);
-  } catch (error: any) {
-    console.error('Error fetching audio messages:', error);
-    // Fallback to sample data on error
-    return sampleAudioMessages;
-  }
-}
+  // Fetch gallery items by tag
+  getGalleryItemsByTag: async (tag: string) => {
+    try {
+      return await client.fetch(
+        `*[_type == "galleryItem" && $tag in tags] | order(date desc)`,
+        { tag: tag }
+      );
+    } catch (error: any) {
+      console.error(`Error fetching gallery items with tag ${tag}:`, error);
+      throw error;
+    }
+  },
 
-// Get a single audio message by ID
-export async function getAudioMessage(id: string) {
-  if (USE_SAMPLE_DATA) {
-    const message = getItemById('audioMessage', id);
-    return message || null;
-  }
-  
-  try {
-    return await client.fetch(
-      `*[_type == "audioMessage" && _id == $id][0]`,
-      { id }
-    );
-  } catch (error: any) {
-    console.error(`Error fetching audio message with ID ${id}:`, error);
-    // Fallback to sample data on error
-    return getItemById('audioMessage', id);
-  }
-}
+  // Fetch featured gallery items
+  getFeaturedItems: async () => {
+    try {
+      return await client.fetch(queries.getFeaturedItems);
+    } catch (error: any) {
+      console.error('Error fetching featured items:', error);
+      throw error;
+    }
+  },
 
-// Search across all content types
-export async function searchContent(query: string) {
-  if (USE_SAMPLE_DATA) {
-    return generateSearchResults(query);
-  }
-  
-  try {
-    const searchQuery = `*[
-      _type in ["loveLetter", "album", "galleryItem", "audioMessage"] &&
-      (title match $searchQuery || description match $searchQuery)
-    ] | order(_createdAt desc)`;
-    
-    return await client.fetch(searchQuery, { searchQuery: `*${query}*` });
-  } catch (error: any) {
-    console.error(`Error searching content with query "${query}":`, error);
-    // Fallback to sample data on error
-    return generateSearchResults(query);
-  }
-}
+  // Fetch landing page data
+  getLandingData: async () => {
+    try {
+      return await client.fetch(queries.getLandingPage);
+    } catch (error: any) {
+      console.error('Error fetching landing data:', error);
+      throw error;
+    }
+  },
 
-// Get recent content across all types
-export async function getRecentContent(limit = 10) {
-  if (USE_SAMPLE_DATA) {
-    return generateRecentContent(limit);
-  }
-  
-  try {
-    const query = `{
-      "loveLetters": *[_type == "loveLetter"] | order(_createdAt desc)[0...${limit}],
-      "albums": *[_type == "album"] | order(_createdAt desc)[0...${limit}],
-      "galleryItems": *[_type == "galleryItem"] | order(date desc)[0...${limit}],
-      "audioMessages": *[_type == "audioMessage"] | order(_createdAt desc)[0...${limit}]
-    }`;
-    
-    return await client.fetch(query);
-  } catch (error: any) {
-    console.error('Error fetching recent content:', error);
-    // Fallback to sample data on error
-    return generateRecentContent(limit);
-  }
-}
+  // Fetch audio messages with filtering capabilities
+  getAudioMessages: async (options = {}) => {
+    try {
+      const params = { ...options };
+      return await client.fetch(queries.getAudioMessages, params);
+    } catch (error: any) {
+      console.error('Error fetching audio messages:', error);
+      throw error;
+    }
+  },
 
-// Get birthday cards
-export async function getBirthdayCards() {
-  if (USE_SAMPLE_DATA) {
-    return sampleBirthdayCards;
+  // Get a single audio message by ID
+  getAudioMessage: async (id: string) => {
+    try {
+      return await client.fetch(
+        `*[_type == "audioMessage" && _id == $id][0]`,
+        { id }
+      );
+    } catch (error: any) {
+      console.error(`Error fetching audio message with ID ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // Search across all content types
+  searchContent: async (query: string) => {
+    try {
+      const searchQuery = `*[
+        _type in ["loveLetter", "album", "galleryItem", "audioMessage"] &&
+        (title match $searchQuery || description match $searchQuery)
+      ] | order(_createdAt desc)`;
+      
+      return await client.fetch(searchQuery, { searchQuery: `*${query}*` });
+    } catch (error: any) {
+      console.error(`Error searching content with query "${query}":`, error);
+      throw error;
+    }
+  },
+
+  // Get recent content across all types
+  getRecentContent: async (limit = 10) => {
+    try {
+      const query = `{
+        "loveLetters": *[_type == "loveLetter"] | order(_createdAt desc)[0...${limit}],
+        "albums": *[_type == "album"] | order(_createdAt desc)[0...${limit}],
+        "galleryItems": *[_type == "galleryItem"] | order(date desc)[0...${limit}],
+        "audioMessages": *[_type == "audioMessage"] | order(_createdAt desc)[0...${limit}]
+      }`;
+      
+      return await client.fetch(query);
+    } catch (error: any) {
+      console.error('Error fetching recent content:', error);
+      throw error;
+    }
+  },
+
+  // Get birthday cards
+  getBirthdayCards: async () => {
+    try {
+      return await client.fetch(`*[_type == "birthdayCard"] | order(_createdAt desc)`);
+    } catch (error: any) {
+      console.error('Error fetching birthday cards:', error);
+      throw error;
+    }
   }
-  
-  try {
-    return await client.fetch(`*[_type == "birthdayCard"] | order(_createdAt desc)`);
-  } catch (error: any) {
-    console.error('Error fetching birthday cards:', error);
-    // Fallback to sample data on error
-    return sampleBirthdayCards;
-  }
-}
+};

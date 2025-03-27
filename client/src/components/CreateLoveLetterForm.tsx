@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from '@/lib/queryClient';
-import { useQueryClient } from '@tanstack/react-query';
+import { client } from "@/lib/sanity";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Heart, Send } from 'lucide-react';
+import ErrorLogger from '@/lib/errorHandling';
 
 interface CreateLoveLetterFormProps {
   onSuccess?: () => void;
@@ -16,131 +19,161 @@ interface CreateLoveLetterFormProps {
 export function CreateLoveLetterForm({ onSuccess, onCancel }: CreateLoveLetterFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [theme, setTheme] = useState('romantic');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!title || !content) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      // Format content as a Portable Text array
-      const formattedContent = [
-        {
-          _type: "block",
-          style: "normal",
-          children: [
-            {
-              _type: "span",
-              text: content
-            }
-          ]
-        }
-      ];
-      
-      // Create love letter object
-      const loveLetter = {
-        title,
-        content: formattedContent,
-        createdAt: new Date().toISOString(),
-        effects: ["hearts", "sparkles"], // Default effects
-      };
-      
-      // Send to API
-      const response = await apiRequest('/api/love-letters', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loveLetter)
-      });
-      
-      // Show success message
+  const createLetterMutation = useMutation({
+    mutationFn: async (letterData: {
+      title: string;
+      content: string;
+      isPrivate: boolean;
+      isAnonymous: boolean;
+      theme: string;
+    }) => {
+      try {
+        const doc = {
+          _type: 'loveLetter',
+          title: letterData.title,
+          content: letterData.content,
+          isPrivate: letterData.isPrivate,
+          isAnonymous: letterData.isAnonymous,
+          theme: letterData.theme,
+          _createdAt: new Date().toISOString()
+        };
+
+        return await client.create(doc);
+      } catch (error) {
+        ErrorLogger.log(
+          'Failed to create love letter',
+          'high',
+          'CreateLoveLetterForm',
+          error instanceof Error ? error : new Error(String(error)),
+          { letterData }
+        );
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loveLetters'] });
       toast({
         title: "Success",
-        description: "Your love letter has been sent!",
-        variant: "default"
+        description: "Your love letter has been sent! ❤️",
       });
-      
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/love-letters'] });
-      
-      // Reset form and call success callback
-      setTitle('');
-      setContent('');
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error('Error creating love letter:', error);
+      if (onSuccess) onSuccess();
+    },
+    onError: (error) => {
       toast({
         title: "Error",
         description: "Failed to send your love letter. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsSubmitting(false);
+    }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      if (!title || !content) {
+        toast({
+          title: "Error",
+          description: "Please provide both a title and content for your letter",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      await createLetterMutation.mutateAsync({
+        title,
+        content,
+        isPrivate,
+        isAnonymous,
+        theme
+      });
+    } catch (error) {
+      ErrorLogger.log(
+        'Form submission failed',
+        'medium',
+        'CreateLoveLetterForm',
+        error instanceof Error ? error : new Error(String(error)),
+        { title, isPrivate, isAnonymous, theme }
+      );
     }
   };
 
   return (
     <Card className="w-full max-w-2xl mx-auto border-pink-200 shadow-lg">
-      <CardHeader className="bg-pink-50 rounded-t-lg">
-        <CardTitle className="text-2xl font-serif text-pink-800">Write a Love Letter</CardTitle>
-        <CardDescription>Express your feelings in a beautiful love letter</CardDescription>
-      </CardHeader>
-      
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4 pt-6">
+        <CardHeader className="bg-pink-50/50 space-y-1">
+          <CardTitle className="text-2xl font-serif text-pink-800 flex items-center gap-2">
+            <Heart className="h-5 w-5" />
+            Write Your Love Letter
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-pink-700">Title</Label>
+            <Label htmlFor="title">Title</Label>
             <Input
               id="title"
-              placeholder="Give your letter a meaningful title"
+              placeholder="Give your letter a meaningful title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="border-pink-200 focus:border-pink-400"
+              className="border-pink-200"
             />
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="content" className="text-pink-700">Your Message</Label>
+            <Label htmlFor="content">Your Message</Label>
             <Textarea
               id="content"
-              placeholder="Write your love letter here..."
+              placeholder="Express your feelings..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[200px] border-pink-200 focus:border-pink-400"
+              className="min-h-[200px] border-pink-200"
             />
           </div>
+
+          <div className="flex items-center justify-between space-x-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={isPrivate}
+                onCheckedChange={setIsPrivate}
+                id="private"
+              />
+              <Label htmlFor="private">Private Letter</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={isAnonymous}
+                onCheckedChange={setIsAnonymous}
+                id="anonymous"
+              />
+              <Label htmlFor="anonymous">Send Anonymously</Label>
+            </div>
+          </div>
         </CardContent>
-        
+
         <CardFooter className="flex justify-between border-t border-pink-100 pt-4">
-          <Button 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={onCancel}
-            className="border-pink-300 text-pink-700 hover:bg-pink-50"
+            className="border-pink-200"
           >
             Cancel
           </Button>
           <Button 
-            type="submit" 
+            type="submit"
             className="bg-pink-600 hover:bg-pink-700 text-white"
-            disabled={isSubmitting}
+            disabled={createLetterMutation.isPending}
           >
-            {isSubmitting ? "Sending..." : "Send Love Letter"}
+            <Send className="h-4 w-4 mr-2" />
+            {createLetterMutation.isPending ? "Sending..." : "Send Letter"}
           </Button>
         </CardFooter>
       </form>
