@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Plus as PlusIcon, Image as PhotoIcon, BookOpen as BookOpenIcon } from "lucide-react";
-import CreateContentModal from './CreateContentModal';
+import { CreateContentModal } from './CreateContentModal';
 
 const CreateContentButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
