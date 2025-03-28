@@ -1,59 +1,73 @@
+
 import { createClient } from '@sanity/client';
 
-export const sanityClient = createClient({
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || 'your-project-id', 
-  dataset: import.meta.env.VITE_SANITY_DATASET || 'production',
+// Initialize the Sanity client
+const sanityClient = createClient({
+  projectId: process.env.SANITY_PROJECT_ID || 'powk3va5',
+  dataset: process.env.SANITY_DATASET || 'production',
   apiVersion: '2023-05-03',
-  token: import.meta.env.VITE_SANITY_TOKEN,
-  useCdn: false, // Set to `true` for production
+  token: process.env.SANITY_TOKEN,
+  useCdn: false, // Set to true for production
 });
 
-// Helper function to create an album in Sanity
-export async function createAlbum(album: {
-  title: string;
-  description?: string;
-  coverImage?: string;
-  isPrivate: boolean;
-}) {
+export const createAlbum = async (albumData: any) => {
   try {
-    // Create a document without the image first
-    const albumDoc = {
+    // Create a slug from the title
+    const slug = albumData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    // Format the data to match the schema in shared/schemas/gallery.ts
+    const formattedData = {
       _type: 'album',
-      title: album.title,
-      description: album.description,
-      isPrivate: album.isPrivate,
-      items: [], // Start with empty items array
+      title: albumData.title,
+      description: albumData.description,
+      slug: {
+        _type: 'slug',
+        current: slug
+      },
+      coverImage: albumData.coverImage ? {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: albumData.coverImage
+        }
+      } : undefined,
+      items: [] // Empty array initially, items will be added later
     };
 
-    // If there's a cover image URL, we need to handle it differently
-    // because Sanity requires images to be uploaded as assets
-    const result = await sanityClient.create(albumDoc);
-
-    console.log('Album created successfully:', result);
-
-    return { success: true, data: result };
+    console.log('Creating album with data:', formattedData);
+    
+    // Send to Sanity
+    const response = await sanityClient.create(formattedData);
+    console.log('Album created successfully:', response);
+    
+    return {
+      success: true,
+      data: response
+    };
   } catch (error) {
     console.error('Error creating album in Sanity:', error);
-    return { success: false, error };
+    throw new Error('Failed to create album in Sanity');
   }
-}
+};
 
-// Helper function to get all albums
-export async function getAlbums() {
+export const fetchAlbums = async () => {
   try {
-    const albums = await sanityClient.fetch(`
-      *[_type == "album"] {
-        _id,
-        title,
-        description,
-        "coverImageUrl": coverImage.asset->url,
-        isPrivate,
-        "itemsCount": count(items)
-      }
-    `);
-    return { success: true, data: albums };
+    const query = `*[_type == "album"] {
+      _id,
+      title,
+      description,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "itemCount": count(items)
+    }`;
+    
+    const result = await sanityClient.fetch(query);
+    return result;
   } catch (error) {
-    console.error('Error fetching albums from Sanity:', error);
-    return { success: false, error };
+    console.error('Error fetching albums:', error);
+    throw error;
   }
-}
+};

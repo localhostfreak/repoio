@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from '@tanstack/react-query';
-import { Switch } from "@/components/ui/switch";
 import { createAlbum } from '@/lib/sanity-client';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface CreateAlbumFormProps {
   onSuccess?: () => void;
@@ -17,8 +17,6 @@ interface CreateAlbumFormProps {
 export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [isPrivate, setIsPrivate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { toast } = useToast();
@@ -42,8 +40,6 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       const album = {
         title,
         description: description || undefined,
-        coverImage: coverImageUrl || undefined,
-        isPrivate
       };
 
       // Send to Sanity
@@ -56,7 +52,7 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       // Show success message
       toast({
         title: "Success",
-        description: "Your album has been created in Sanity!",
+        description: "Your memory album has been created!",
         variant: "default"
       });
 
@@ -66,8 +62,6 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       // Reset form and call success callback
       setTitle('');
       setDescription('');
-      setCoverImageUrl('');
-      setIsPrivate(false);
 
       if (onSuccess) {
         onSuccess();
@@ -76,7 +70,7 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       console.error('Error creating album:', error);
       toast({
         title: "Error",
-        description: "Failed to create your album in Sanity. Please try again.",
+        description: "Failed to create your album. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -102,10 +96,11 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
               onChange={(e) => setTitle(e.target.value)}
               className="border-pink-200 focus:border-pink-400"
             />
+            <VisuallyHidden>Album Title</VisuallyHidden>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-pink-700">Description (optional)</Label>
+            <Label htmlFor="description" className="text-pink-700">Description</Label>
             <Textarea
               id="description"
               placeholder="Describe what this album means to you..."
@@ -115,37 +110,18 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="coverImage" className="text-pink-700">Cover Image URL (optional)</Label>
-            <Input
-              id="coverImage"
-              placeholder="For now, leave this empty as image uploads require extra setup"
-              value={coverImageUrl}
-              onChange={(e) => setCoverImageUrl(e.target.value)}
-              className="border-pink-200 focus:border-pink-400"
-              disabled={true}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Image upload feature is disabled for now. In a complete implementation, we would integrate with Sanity's asset pipeline.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-2 pt-2">
-            <Switch
-              id="isPrivate"
-              checked={isPrivate}
-              onCheckedChange={setIsPrivate}
-            />
-            <Label htmlFor="isPrivate" className="text-pink-700">Make this album private</Label>
-          </div>
-
           <div className="mt-4 border border-pink-200 rounded-md p-2">
-            <p className="text-sm text-pink-700 mb-2">Default Album Cover:</p>
-            <img 
-              src="https://via.placeholder.com/400x300?text=Memory+Album" 
-              alt="Default Album Cover" 
-              className="max-h-64 rounded-md mx-auto"
-            />
+            <p className="text-sm text-pink-700 mb-2">Preview:</p>
+            <div className="bg-white rounded-md p-4 shadow-sm">
+              <h3 className="font-semibold text-lg">{title || "Your Album Title"}</h3>
+              <p className="text-gray-600 text-sm mt-1">{description || "Album description will appear here"}</p>
+              <div className="mt-3 bg-gray-100 h-32 rounded flex items-center justify-center">
+                <p className="text-gray-400">Album Cover Image</p>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                You'll be able to add photos to this album after creation
+              </p>
+            </div>
           </div>
         </CardContent>
 
