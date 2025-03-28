@@ -56,7 +56,7 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-const memoryState: State = { toasts: [] }
+let memoryState: State = { toasts: [] }
 
 let listeners: ((state: State) => void)[] = []
 

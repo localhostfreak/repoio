@@ -93,9 +93,9 @@ const CreateContentButton: React.FC = () => {
       </div>
 
       <CreateContentModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        type={contentType} 
+        open={isModalOpen} 
+        onOpenChange={setIsModalOpen} 
+        contentType={contentType} 
       />
     </>
   );

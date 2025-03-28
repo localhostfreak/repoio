@@ -14,18 +14,31 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 type ContentType = 'album' | 'photo' | 'audio' | 'letter';
 
 interface CreateContentModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   onSuccess?: () => void;
   contentType?: ContentType;
+  type?: ContentType;
 }
 
 export function CreateContentModal({ 
   open, 
+  isOpen,
   onOpenChange, 
+  onClose,
   onSuccess,
-  contentType = 'album' 
+  contentType = 'album',
+  type
 }: CreateContentModalProps) {
+  // Support both prop patterns (for backward compatibility)
+  const isModalOpen = open ?? isOpen ?? false;
+  const handleOpenChange = (newOpen: boolean) => {
+    if (onOpenChange) onOpenChange(newOpen);
+    if (!newOpen && onClose) onClose();
+  };
+  const activeContentType = contentType ?? type ?? 'album';
   const [activeTab, setActiveTab] = useState<ContentType>(contentType);
 
   const handleSuccess = () => {
@@ -39,7 +52,7 @@ export function CreateContentModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto w-[calc(100%-2rem)] mx-auto">
         <DialogHeader className="p-4 sm:p-6 pb-3 sm:pb-4 bg-pink-50 space-y-2 sm:space-y-3">
           <DialogTitle className="text-xl sm:text-2xl font-serif text-pink-800">Create New Content</DialogTitle>
@@ -48,7 +61,7 @@ export function CreateContentModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as ContentType)} className="w-full">
+        <Tabs defaultValue={activeContentType} onValueChange={(value) => setActiveTab(value as ContentType)} className="w-full">
           <TabsList className="w-full grid grid-cols-4 bg-pink-50/60 border-y border-pink-100 p-0">
             <TabsTrigger value="album" className="data-[state=active]:bg-pink-100">
               <Album className="mr-2 h-4 w-4" />
