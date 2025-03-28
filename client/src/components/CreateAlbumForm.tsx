@@ -5,9 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from '@/lib/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { Switch } from "@/components/ui/switch";
+import { createAlbum } from '@/lib/sanity-client';
 
 interface CreateAlbumFormProps {
   onSuccess?: () => void;
@@ -46,24 +46,22 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
         isPrivate
       };
       
-      // Send to API
-      const response = await apiRequest('/api/albums', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(album)
-      });
+      // Send to Sanity
+      const result = await createAlbum(album);
+      
+      if (!result.success) {
+        throw new Error('Failed to create album in Sanity');
+      }
       
       // Show success message
       toast({
         title: "Success",
-        description: "Your album has been created!",
+        description: "Your album has been created in Sanity!",
         variant: "default"
       });
       
       // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/albums'] });
+      queryClient.invalidateQueries({ queryKey: ['albums'] });
       
       // Reset form and call success callback
       setTitle('');
@@ -78,7 +76,7 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       console.error('Error creating album:', error);
       toast({
         title: "Error",
-        description: "Failed to create your album. Please try again.",
+        description: "Failed to create your album in Sanity. Please try again.",
         variant: "destructive"
       });
     } finally {

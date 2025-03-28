@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Heart, Image, Mic, BookOpen } from "lucide-react";
 import CreateAlbumForm from "./CreateAlbumForm";
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'; // Added import for VisuallyHidden
 
 export type ContentType = 'loveLetter' | 'galleryItem' | 'audioMessage' | 'album';
 
@@ -56,7 +57,10 @@ export function CreateContentModal({
   if (contentType === 'album') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full max-w-3xl p-0 bg-transparent border-none shadow-none">
+        <DialogContent className="w-full max-w-3xl p-0 bg-transparent border-none shadow-none" aria-describedby="dialog-description-album"> {/* Added aria-describedby */}
+          <VisuallyHidden> {/* Added VisuallyHidden for DialogTitle */}
+            <DialogTitle id="dialog-description-album">Create New Album</DialogTitle> {/* Added DialogTitle */}
+          </VisuallyHidden>
           {renderContentForm()}
         </DialogContent>
       </Dialog>
@@ -65,7 +69,7 @@ export function CreateContentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-2xl">
+      <DialogContent className="w-full max-w-2xl" aria-describedby="dialog-description"> {/* Added aria-describedby */}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             {contentType === 'loveLetter' && (
@@ -87,7 +91,7 @@ export function CreateContentModal({
               </>
             )}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription id="dialog-description"> {/* Added id to DialogDescription */}
             {contentType === 'loveLetter' && "Express your feelings in a beautiful letter"}
             {contentType === 'galleryItem' && "Share photos and videos of your special moments"}
             {contentType === 'audioMessage' && "Record your voice for your loved one to hear"}
