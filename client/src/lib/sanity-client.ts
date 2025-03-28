@@ -1,12 +1,11 @@
-
 import { createClient } from '@sanity/client';
 
 // Initialize the Sanity client
 const sanityClient = createClient({
-  projectId: process.env.SANITY_PROJECT_ID || 'powk3va5',
-  dataset: process.env.SANITY_DATASET || 'production',
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || 'powk3va5',
+  dataset: import.meta.env.VITE_SANITY_DATASET || 'production',
   apiVersion: '2023-05-03',
-  token: process.env.SANITY_TOKEN,
+  token: import.meta.env.VITE_SANITY_TOKEN,
   useCdn: false, // Set to true for production
 });
 
@@ -38,18 +37,21 @@ export const createAlbum = async (albumData: any) => {
     };
 
     console.log('Creating album with data:', formattedData);
-    
+
     // Send to Sanity
     const response = await sanityClient.create(formattedData);
     console.log('Album created successfully:', response);
-    
+
     return {
       success: true,
       data: response
     };
   } catch (error) {
     console.error('Error creating album in Sanity:', error);
-    throw new Error('Failed to create album in Sanity');
+    return {
+      success: false,
+      error
+    };
   }
 };
 

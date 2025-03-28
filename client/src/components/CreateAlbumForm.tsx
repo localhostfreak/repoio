@@ -46,7 +46,7 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
       const result = await createAlbum(album);
 
       if (!result.success) {
-        throw new Error('Failed to create album in Sanity');
+        throw new Error(result.error?.message || 'Failed to create album in Sanity');
       }
 
       // Show success message
