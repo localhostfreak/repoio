@@ -1,5 +1,4 @@
-
-import { useToast as useToastUI } from "@/components/ui/use-toast";
+import { useToast as useToastUI } from "@/hooks/use-toast";
 
 export const useToast = () => {
   const { toast } = useToastUI();
