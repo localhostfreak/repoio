@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -11,21 +12,31 @@ import { Album, Image, Headphones, PenLine } from "lucide-react";
 import CreateAlbumForm from "./CreateAlbumForm";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
+export type ContentType = 'album' | 'photo' | 'audio' | 'letter' | 'loveLetter' | 'galleryItem' | 'audioMessage';
+
 interface CreateContentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+  contentType?: ContentType;
 }
 
-export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps) {
-  const [activeTab, setActiveTab] = useState("album");
+export function CreateContentModal({ 
+  open, 
+  onOpenChange, 
+  onSuccess,
+  contentType = 'album' 
+}: CreateContentModalProps) {
+  const [activeTab, setActiveTab] = useState(contentType);
 
-  // Handle form submission success
   const handleSuccess = () => {
-    onClose();
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-gradient-to-br from-pink-50 to-white">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-2xl font-serif text-center text-pink-800">
@@ -37,13 +48,8 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs
-          defaultValue="album"
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-4 mx-6">
+        <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as ContentType)} className="w-full">
+          <TabsList className="grid grid-cols-4 h-auto p-1 mx-4 mb-0 bg-pink-50 rounded-lg">
             <TabsTrigger value="album" className="data-[state=active]:bg-pink-100">
               <Album className="mr-2 h-4 w-4" />
               Album
@@ -54,7 +60,7 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
             </TabsTrigger>
             <TabsTrigger value="audio" className="data-[state=active]:bg-pink-100">
               <Headphones className="mr-2 h-4 w-4" />
-              Voice
+              Audio
             </TabsTrigger>
             <TabsTrigger value="letter" className="data-[state=active]:bg-pink-100">
               <PenLine className="mr-2 h-4 w-4" />
@@ -63,7 +69,7 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
           </TabsList>
 
           <TabsContent value="album" className="mt-0 p-6">
-            <CreateAlbumForm onSuccess={handleSuccess} onCancel={onClose} />
+            <CreateAlbumForm onSuccess={handleSuccess} onCancel={() => onOpenChange(false)} />
           </TabsContent>
 
           <TabsContent value="photo" className="mt-0 p-6">
@@ -79,9 +85,9 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
           <TabsContent value="audio" className="mt-0 p-6">
             <div className="text-center p-10 bg-gray-50 rounded-lg">
               <Headphones className="w-12 h-12 mx-auto text-pink-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Voice Messages</h3>
+              <h3 className="text-xl font-medium mb-2">Audio Message</h3>
               <p className="text-gray-600">
-                This feature is coming soon! You'll be able to record and send voice messages to express your feelings.
+                This feature is coming soon! You'll be able to record and share voice messages.
               </p>
             </div>
           </TabsContent>
@@ -89,9 +95,9 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
           <TabsContent value="letter" className="mt-0 p-6">
             <div className="text-center p-10 bg-gray-50 rounded-lg">
               <PenLine className="w-12 h-12 mx-auto text-pink-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Love Letters</h3>
+              <h3 className="text-xl font-medium mb-2">Love Letter</h3>
               <p className="text-gray-600">
-                This feature is coming soon! You'll be able to write and design beautiful digital love letters.
+                This feature is coming soon! You'll be able to write and share beautiful love letters.
               </p>
             </div>
           </TabsContent>
@@ -100,3 +106,5 @@ export function CreateContentModal({ isOpen, onClose }: CreateContentModalProps)
     </Dialog>
   );
 }
+
+export default CreateContentModal;
