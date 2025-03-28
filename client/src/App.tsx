@@ -7,7 +7,7 @@ import Home from "@/pages/home";
 import HeartBackground from "./components/HeartBackground";
 import CreateContentButton from "./components/CreateContentButton";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext } from '@hello-pangea/dnd';
 import LoveLetterDetail from "@/pages/LoveLetterDetail";
 
 function Router() {
