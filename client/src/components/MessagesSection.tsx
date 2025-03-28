@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/lib/sanity";
 import groq from "groq";
@@ -10,37 +10,32 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  CircularProgress,
   Switch,
   useMediaQuery,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { useTheme } from "@mui/system";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { AutoSizer, List } from "react-virtualized";
-import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
-import { HoverEffect } from "@/components/ui/card-hover-effect";
-import { GlowingEffect } from "@/components/ui/glowing-effect";
-import { ExpandableCard } from "@/components/ui/expandable-card"; // Custom component, defined beloww
-import { Mic, Heart, Play, Pause, Volume2, VolumeX, SkipBack, SkipForward } from "lucide-react";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DraggableProvided,
+} from "react-beautiful-dnd";
+import { Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { AudioPlayer } from "@/components/AudioPlayer"; // New component, defined below
-import { Slider } from "@/components/ui/slider";
 import { useInView } from "react-intersection-observer";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useToast } from "@/hooks/use-toast";
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import AudioCard from "./AudioCard";
 
-const getMessagesQuery = groq`
-  *[_type == "audioMessage"] | order(_createdAt desc) {
-    _id, title, audioFile { asset-> { url, _ref } }, caption, description, mood,
-    duration, isPrivate, backgroundMusic { asset-> { url, _ref } }, visualizer,
-    scheduledFor, transcript, reactions, background, _createdAt
-  }
-`;
+// GROQ query (unchanged)
+const getMessagesQuery = groq`*[_type == "audioMessage"] | order(_createdAt desc) {
+  _id, title, audioFile { asset-> { url, _ref } }, caption, description, mood,
+  duration, isPrivate, backgroundMusic { asset-> { url, _ref } }, visualizer,
+  scheduledFor, transcript, reactions, background, _createdAt
+}`;
 
+// AudioMessageType interface (unchanged)
 interface AudioMessageType {
   _id: string;
   title: string;
@@ -60,204 +55,65 @@ interface AudioMessageType {
   audioUrl?: string;
 }
 
-const generateRandomBars = (count: number) => 
-  Array.from({ length: count }, () => Math.random() * 100);
+// Grid areas and card sizes (unchanged from last iteration)
+const gridAreasDesktop = `
+  "card1 card1 card2 card3"
+  "card4 card5 card2 card6"
+  "card7 card8 card9 card6"
+  "card10 card11 card12 card13"
+`;
 
-// Update AudioVisualizer component
-const AudioVisualizer = ({ isPlaying, progress, isDark }: { 
-  isPlaying: boolean; 
-  progress: number;
-  isDark: boolean;
-}) => {
-  const [bars] = useState(() => generateRandomBars(30));
-  
-  return (
-    <div className="flex items-end h-full gap-[2px]">
-      {bars.map((height, i) => {
-        const isActive = (i / bars.length) * 100 <= progress;
-        return (
-          <motion.div
-            key={i}
-            className={cn(
-              "w-1 rounded-full",
-              isActive 
-                ? "bg-gradient-to-t from-pink-500 to-purple-500" 
-                : isDark ? "bg-gray-700" : "bg-gray-200"
-            )}
-            animate={{
-              height: isPlaying ? `${height}%` : "40%",
-              opacity: isPlaying ? 1 : 0.5
-            }}
-            transition={{
-              duration: 0.5,
-              repeat: isPlaying ? Infinity : 0,
-              repeatType: "reverse",
-              delay: i * 0.02
-            }}
-            style={{ minHeight: 4 }}
-          />
-        );
-      })}
-    </div>
-  );
+const gridAreasMobile = `
+  "card1"
+  "card2"
+  "card3"
+  "card4"
+  "card5"
+  "card6"
+  "card7"
+  "card8"
+  "card9"
+  "card10"
+  "card11"
+  "card12"
+  "card13"
+`;
+
+const cardSizes = [
+  "col-span-2 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-2 min-h-[260px] max-h-[300px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-2 min-h-[260px] max-h-[300px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-2 min-h-[260px] max-h-[300px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+  "col-span-1 row-span-1 min-h-[120px] max-h-[150px]",
+];
+
+// Custom type to merge motion and draggable props
+type MotionDraggableProps = HTMLMotionProps<"div"> & {
+  "data-rbd-draggable-id"?: string;
+  "data-rbd-draggable-context-id"?: string;
+  "data-rbd-drag-handle-draggable-id"?: string;
+  "data-rbd-drag-handle-context-id"?: string;
+  onDragStart?: any; // Relax typing to avoid conflict
 };
-
-// Update AudioCard props type
-interface AudioCardProps {
-  message: AudioMessageType;
-  index: number;
-  isDark: boolean;
-  provided: any;
-  inView: boolean;
-}
-
-// Update AudioCard component
-const AudioCard = ({ message, index, isDark, provided, inView }: AudioCardProps) => {
-  const { state, controls } = useAudioPlayer(message.audioUrl);
-  const { toast } = useToast();
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const progressPercent = (state.currentTime / state.duration) * 100 || 0;
-
-  return (
-    <motion.div
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className={cn(
-        "relative mb-4 group",
-        "transform-gpu transition-all duration-300",
-        "touch-pan-y", // Improve touch handling
-        isDark ? "text-white" : "text-gray-900"
-      )}
-    >
-      <div className={cn(
-        "relative overflow-hidden rounded-2xl",
-        "backdrop-blur-sm backdrop-filter",
-        "transform-gpu transition-all duration-300",
-        isDark 
-          ? "bg-gray-800/90 border border-gray-700/50" 
-          : "bg-white/90 border border-gray-200/50",
-        "group hover:shadow-xl hover:scale-[1.02]"
-      )}>
-        {/* Modern Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 via-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        <div className="relative z-10 p-4">
-          {/* Title Section */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold truncate">{message.title}</h3>
-            {state.isBuffering && (
-              <div className="animate-pulse text-pink-500">
-                <span className="text-xs">Loading...</span>
-              </div>
-            )}
-          </div>
-
-          {/* Modern Waveform Visualizer */}
-          <div className="relative h-16 mb-4">
-            <div className="absolute inset-0">
-              <AudioVisualizer 
-                isPlaying={state.isPlaying} 
-                progress={progressPercent}
-                isDark={isDark}
-              />
-            </div>
-            {/* Progress Overlay */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20"
-              style={{ clipPath: `inset(0 ${100 - progressPercent}% 0 0)` }}
-            />
-          </div>
-
-          {/* Modern Controls */}
-          <div className="flex items-center gap-4">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => state.isPlaying ? controls.pause() : controls.play()}
-              className={cn(
-                "p-3 rounded-full",
-                "bg-gradient-to-r from-pink-500 to-purple-500",
-                "text-white shadow-lg",
-                "transform transition-all",
-                "hover:shadow-pink-500/25 hover:from-pink-600 hover:to-purple-600"
-              )}
-            >
-              {state.isPlaying ? <Pause size={20} /> : <Play size={20} />}
-            </motion.button>
-
-            {/* Time and Progress */}
-            <div className="flex-1">
-              <div className="relative h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-pink-500 to-purple-500"
-                  style={{ width: `${progressPercent}%` }}
-                  transition={{ type: "spring", damping: 15 }}
-                />
-                <input
-                  type="range"
-                  min={0}
-                  max={state.duration}
-                  value={state.currentTime}
-                  onChange={(e) => controls.seek(parseFloat(e.target.value))}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-              </div>
-              <div className="flex justify-between mt-1 text-xs opacity-75">
-                <span>{formatTime(state.currentTime)}</span>
-                <span>{formatTime(state.duration)}</span>
-              </div>
-            </div>
-
-            {/* Volume Control */}
-            <div className="hidden sm:flex items-center gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => controls.setVolume(state.volume === 0 ? 0.7 : 0)}
-                className="text-pink-500"
-              >
-                {state.volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </Button>
-              <Slider
-                value={[state.volume * 100]}
-                max={100}
-                className="w-20"
-                onValueChange={(value) => controls.setVolume(value[0] / 100)}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-AudioCard.displayName = 'AudioCard';
 
 const MessagesSection = () => {
   const queryClient = useQueryClient();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [layout, setLayout] = useState<"bento" | "hover" | "expandable">("bento");
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const [messagesOrder, setMessagesOrder] = useState<AudioMessageType[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [ref, inView] = useInView({
-    threshold: 0.1,
-    triggerOnce: true,
-  });
+  const [inViewRef, inView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   const { data: messages = [], isLoading, error } = useQuery<AudioMessageType[]>({
     queryKey: ["audioMessages", moodFilter],
@@ -312,44 +168,55 @@ const MessagesSection = () => {
     setMessagesOrder(items);
   };
 
-  // Simplified renderMessageCard function
-  const renderMessageCard = (message: AudioMessageType, index: number) => {
-    return (
-      <Draggable key={message._id} draggableId={message._id} index={index}>
-        {(provided) => (
+  const renderMessageCard = (message: AudioMessageType, index: number) => (
+    <Draggable key={message._id} draggableId={message._id} index={index}>
+      {(provided: DraggableProvided) => (
+        <motion.div
+          className={cn(
+            "rounded-2xl shadow-md transition-all duration-300 overflow-hidden",
+            cardSizes[index % cardSizes.length],
+            "hover:scale-105 hover:shadow-xl",
+            isDark ? "bg-gray-800/95" : "bg-white/95"
+          )}
+          style={{ gridArea: `card${(index % 13) + 1}` }}
+          whileHover={{ zIndex: 10 }}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+          // Explicitly type as MotionDraggableProps to resolve conflict
+          // @ts-ignore
+          as={motion.div as any}
+        >
           <AudioCard
             message={message}
             index={index}
             isDark={isDark}
-            provided={provided}
             inView={inView}
+            provided={provided} // Pass provided back to AudioCard
           />
-        )}
-      </Draggable>
-    );
-  };
+        </motion.div>
+      )}
+    </Draggable>
+  );
 
   return (
-    <ScrollArea 
+    <ScrollArea
       className={cn(
         "h-[calc(100vh-4rem)] overflow-y-auto overscroll-none",
-        "scrollbar-thin scrollbar-thumb-pink-500/20 scrollbar-track-transparent",
-        isDark && "dark scrollbar-thumb-pink-400/20"
+        "scrollbar-thin scrollbar-thumb-pink-500/30 scrollbar-track-transparent",
+        isDark && "dark scrollbar-thumb-pink-400/30"
       )}
       role="region"
       aria-label="Audio messages section"
     >
-      <div 
-        ref={(el) => {
-          containerRef.current = el;
-          ref(el); // Attach intersection observer ref
-        }}
+      <div
+        ref={inViewRef} // Use the callback ref from useInView
         className={cn(
           "container mx-auto px-4 py-8 transition-colors duration-300",
           "min-h-screen",
-          isDark 
-            ? "bg-gray-900 text-white bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 via-gray-900 to-black" 
-            : "bg-white text-gray-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-50 via-white to-gray-100"
+          isDark
+            ? "bg-gradient-to-b from-gray-900 to-black text-white"
+            : "bg-gradient-to-b from-gray-50 to-white text-gray-900"
         )}
       >
         {/* Header Section */}
@@ -358,35 +225,29 @@ const MessagesSection = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <motion.div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <Typography 
-              variant="h4" 
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+            <Typography
+              variant="h4"
               className={cn(
-                "transition-colors duration-300",
+                "font-bold transition-colors duration-300",
                 isDark ? "text-pink-400" : "text-pink-600"
               )}
             >
               Audio Story Chapters
+              {moodFilter && (
+                <span className="text-sm ml-2 opacity-75">
+                  ({moodFilter.charAt(0).toUpperCase() + moodFilter.slice(1)})
+                </span>
+              )}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: { xs: 2, sm: 0 } }}>
-              <FormControl size="small">
-                <InputLabel>Layout</InputLabel>
-                <Select
-                  value={layout}
-                  label="Layout"
-                  onChange={(e) => setLayout(e.target.value as "bento" | "hover" | "expandable")}
-                >
-                  <MenuItem value="bento">Bento Grid</MenuItem>
-                  <MenuItem value="hover">Hover Effect</MenuItem>
-                  <MenuItem value="expandable">Expandable Cards</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl size="small">
+              <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel>Mood</InputLabel>
                 <Select
                   value={moodFilter || ""}
                   label="Mood"
                   onChange={(e) => setMoodFilter(e.target.value || null)}
+                  className={cn(isDark ? "text-white" : "text-gray-900")}
                 >
                   <MenuItem value="">All Moods</MenuItem>
                   <MenuItem value="romantic">Romantic</MenuItem>
@@ -396,8 +257,8 @@ const MessagesSection = () => {
                   <MenuItem value="missingYou">Missing You</MenuItem>
                 </Select>
               </FormControl>
-              <Switch 
-                checked={isDark} 
+              <Switch
+                checked={isDark}
                 onChange={() => setIsDark(!isDark)}
                 className={cn(
                   "transition-colors duration-300",
@@ -405,7 +266,7 @@ const MessagesSection = () => {
                 )}
               />
             </Box>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Messages Grid */}
@@ -417,11 +278,14 @@ const MessagesSection = () => {
                 ref={provided.innerRef}
                 className={cn(
                   "grid gap-4 transition-all duration-300",
-                  "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-                  "auto-rows-max"
+                  isMobile ? "grid-cols-1" : "grid-cols-4",
+                  "auto-rows-min"
                 )}
+                style={{
+                  gridTemplateAreas: isMobile ? gridAreasMobile : gridAreasDesktop,
+                }}
               >
-                {filteredMessages.map((message, index) => 
+                {filteredMessages.map((message, index) =>
                   renderMessageCard(message, index)
                 )}
                 {provided.placeholder}
@@ -439,14 +303,13 @@ const MessagesSection = () => {
           <Button
             size="lg"
             className={cn(
-              "rounded-full transition-all duration-300",
-              isDark 
+              "rounded-full shadow-lg transition-all duration-300",
+              isDark
                 ? "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
                 : "bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white"
             )}
           >
-            <Mic className="mr-2" />
-            Record New Story
+            <Mic className="mr-2" /> Record New Story
           </Button>
         </motion.div>
       </div>

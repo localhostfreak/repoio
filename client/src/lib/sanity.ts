@@ -42,16 +42,30 @@ export async function uploadAudioToSanity(audioFile: File) {
   }
 }
 
+export async function createSanityDocument(type: string, document: any) {
+  try {
+    return await client.create({
+      _type: type,
+      ...document,
+      _createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Sanity creation error:', error);
+    throw new Error(`Failed to create ${type} document`);
+  }
+}
+
 // Queries
-export const getLettersQuery = `*[_type == "loveLetter"] | order(createdAt desc) {
+export const getLettersQuery = groq`*[_type == "loveLetter"] | order(createdAt desc) {
   _id,
   title,
   content,
   theme,
   effects,
+  isPrivate,
   createdAt,
-  "author": author->name,
-  "coverImage": theme.primaryColor
+  animations,
+  "coverColor": theme.primaryColor
 }`;
 
 export const getAlbumsQuery = `*[_type == "album" && !isPrivate || sharedWith[0] == $identity] | order(_createdAt desc) {
@@ -77,9 +91,10 @@ export const getGalleryItemsQuery = `*[_type == "galleryItem" && !isPrivate || s
   category
 }`;
 
-export const getLandingPageQuery = `*[_type == "landing"][0] {
+export const getLandingPageQuery = groq`*[_type == "landing"][0] {
   title,
-  message
+  message,
+  backgroundEffect
 }`;
 
 // Update the audio messages query to include all fields
@@ -115,19 +130,15 @@ export const getFeaturedItemsQuery = `*[_type == "galleryItem" && isFavorite == 
 // Additional queries for enhanced features
 
 // Get a single love letter by ID
-export const getLoveLetterByIdQuery = `*[_type == "loveLetter" && _id == $id][0] {
+export const getLoveLetterByIdQuery = groq`*[_type == "loveLetter" && _id == $id][0] {
   _id,
   title,
   content,
   theme,
   effects,
+  isPrivate,
   createdAt,
-  "author": author->name,
-  "coverImage": theme.primaryColor,
-  privacy,
-  scheduling,
-  animations,
-  letters
+  animations
 }`;
 
 // Get album with all its items

@@ -3,31 +3,39 @@ import LoveLetterCard from "./LoveLetterCard";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Heart, PenTool } from "lucide-react";
+import { client, getLettersQuery } from "@/lib/sanity";
 
 interface Letter {
   _id: string;
   title: string;
   content: any;
-  _createdAt?: string;
-  createdAt?: string;
+  theme?: {
+    primaryColor: string;
+    fontFamily: string;
+    animation: string;
+  };
+  effects?: string[];
+  isPrivate: boolean;
+  createdAt: string;
+  animations?: {
+    openingEffect: 'fold' | 'fade' | 'butterfly' | 'hearts';
+    backgroundEffect: 'particles' | 'petals' | 'stars' | 'none';
+  };
 }
 
-const LoveLettersSection = () => {
-  const { data, isLoading, isError } = useQuery<Letter[]>({
-    queryKey: ["/api/love-letters"],
-    select: (data) => {
-      // Ensure data is always an array
-      if (!data) return [];
-      if (!Array.isArray(data)) return [data as any];
-      return data;
-    }
+interface LoveLettersSectionProps {
+  isDarkMode: boolean;
+}
+
+const LoveLettersSection = ({ isDarkMode }: LoveLettersSectionProps) => {
+  const { data: letters = [], isLoading, isError } = useQuery<Letter[]>({
+    queryKey: ['letters'],
+    queryFn: () => client.fetch(getLettersQuery),
+    staleTime: 5 * 60 * 1000
   });
 
-  // Safe accessing the letters data
-  const letters = data || [];
-
   return (
-    <section id="love-letters" className="py-20 relative overflow-hidden">
+    <section className={`py-12 w-full ${isDarkMode ? 'text-[#E6D9F2]' : 'text-[#4A4A4A]'}`}>
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10 opacity-5">
         <div className="absolute top-0 right-0 w-1/3 h-1/3">
@@ -38,7 +46,7 @@ const LoveLettersSection = () => {
         </div>
       </div>
       
-      <div className="container mx-auto px-4">
+      <div className="w-full px-4">
         <motion.div 
           className="flex items-center justify-center mb-16 gap-3"
           initial={{ opacity: 0, y: 20 }}
@@ -76,7 +84,7 @@ const LoveLettersSection = () => {
               >
                 <LoveLetterCard 
                   title={letter.title || "My Love"}
-                  date={letter._createdAt || letter.createdAt || new Date().toISOString()}
+                  date={letter.createdAt || new Date().toISOString()}
                   content={Array.isArray(letter.content) 
                     ? letter.content.map((block: any) => 
                         block.children?.map((child: any) => child.text).join("")).join("\n")
