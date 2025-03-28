@@ -191,7 +191,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto p-2">
+    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto p-2 relative">
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Create New Album</h2>
         
@@ -404,7 +404,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Theme Color</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {THEME_COLORS.map(color => (
                   <button
                     key={color.value}
@@ -427,7 +427,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
             
             <div>
               <label className="block text-sm font-medium mb-2">Layout Style</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setTheme({ ...theme, layout: 'grid' })}

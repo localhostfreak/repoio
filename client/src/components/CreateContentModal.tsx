@@ -40,7 +40,7 @@ export function CreateContentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-[550px] rounded-xl p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto w-[calc(100%-2rem)] mx-auto">
         <DialogHeader className="p-4 sm:p-6 pb-3 sm:pb-4 bg-pink-50 space-y-2 sm:space-y-3">
           <DialogTitle className="text-xl sm:text-2xl font-serif text-pink-800">Create New Content</DialogTitle>
           <DialogDescription className="text-sm sm:text-base text-pink-700">

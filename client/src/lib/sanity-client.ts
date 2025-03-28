@@ -11,8 +11,25 @@ const sanityClient = createClient({
 
 // Assumed to exist and handle image uploads to Sanity.  Implementation details omitted for brevity.
 const uploadImage = async (imageUrl: string): Promise<string> => {
-  //Implementation to upload image and return its reference id.
-  throw new Error("Implementation for uploadImage is missing");
+  // Extract the base64 part from data URL
+  const base64Data = imageUrl.split(',')[1];
+  
+  if (!base64Data) {
+    throw new Error("Invalid image format");
+  }
+  
+  try {
+    // Upload the image to Sanity's CDN
+    const result = await sanityClient.assets.upload('image', Buffer.from(base64Data, 'base64'), {
+      filename: `album_cover_${Date.now()}.jpg`
+    });
+    
+    // Return the image reference ID
+    return result._id;
+  } catch (error) {
+    console.error('Error uploading image to Sanity:', error);
+    throw new Error('Failed to upload image');
+  }
 };
 
 
