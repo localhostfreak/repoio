@@ -15,14 +15,14 @@ export interface CreateContentModalProps {
   type?: ContentType;
 }
 
-export const CreateContentModal: React.FC<CreateContentModalProps> = ({
+export const CreateContentModal = ({
   open, 
   isOpen,
   onOpenChange, 
   onSuccess,
   contentType = 'album',
   type
-}) => {
+}: CreateContentModalProps) => {
   const isModalOpen = open ?? isOpen ?? false;
   const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) onOpenChange(newOpen);
