@@ -1,4 +1,3 @@
-
 import { createClient } from '@sanity/client';
 
 export const sanityClient = createClient({
@@ -17,21 +16,21 @@ export async function createAlbum(album: {
   isPrivate: boolean;
 }) {
   try {
-    const result = await sanityClient.create({
+    // Create a document without the image first
+    const albumDoc = {
       _type: 'album',
       title: album.title,
       description: album.description,
-      coverImage: album.coverImage ? {
-        _type: 'image',
-        asset: {
-          _type: 'reference',
-          _ref: album.coverImage // Should be an image reference ID from Sanity
-        }
-      } : undefined,
       isPrivate: album.isPrivate,
       items: [], // Start with empty items array
-    });
-    
+    };
+
+    // If there's a cover image URL, we need to handle it differently
+    // because Sanity requires images to be uploaded as assets
+    const result = await sanityClient.create(albumDoc);
+
+    console.log('Album created successfully:', result);
+
     return { success: true, data: result };
   } catch (error) {
     console.error('Error creating album in Sanity:', error);

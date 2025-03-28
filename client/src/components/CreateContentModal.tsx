@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Heart, Image, Mic, BookOpen } from "lucide-react";
 import CreateAlbumForm from "./CreateAlbumForm";
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'; // Added import for VisuallyHidden
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 export type ContentType = 'loveLetter' | 'galleryItem' | 'audioMessage' | 'album';
 
@@ -25,8 +25,6 @@ export function CreateContentModal({
   contentType,
   onSuccess
 }: CreateContentModalProps) {
-  // This renders the correct form based on content type
-
   const renderContentForm = () => {
     switch (contentType) {
       case 'album':
@@ -53,13 +51,12 @@ export function CreateContentModal({
     }
   };
 
-  // For album type, we don't need the default dialog styling
   if (contentType === 'album') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full max-w-3xl p-0 bg-transparent border-none shadow-none" aria-describedby="dialog-description-album"> {/* Added aria-describedby */}
-          <VisuallyHidden> {/* Added VisuallyHidden for DialogTitle */}
-            <DialogTitle id="dialog-description-album">Create New Album</DialogTitle> {/* Added DialogTitle */}
+        <DialogContent className="w-full max-w-3xl p-0 bg-transparent border-none shadow-none" aria-describedby="dialog-description-album"> 
+          <VisuallyHidden>
+            <DialogTitle id="dialog-description-album">Create New Album</DialogTitle> 
           </VisuallyHidden>
           {renderContentForm()}
         </DialogContent>
@@ -69,7 +66,7 @@ export function CreateContentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-2xl" aria-describedby="dialog-description"> {/* Added aria-describedby */}
+      <DialogContent className="w-full max-w-2xl" aria-describedby="dialog-description"> 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             {contentType === 'loveLetter' && (
@@ -91,7 +88,7 @@ export function CreateContentModal({
               </>
             )}
           </DialogTitle>
-          <DialogDescription id="dialog-description"> {/* Added id to DialogDescription */}
+          <DialogDescription id="dialog-description"> 
             {contentType === 'loveLetter' && "Express your feelings in a beautiful letter"}
             {contentType === 'galleryItem' && "Share photos and videos of your special moments"}
             {contentType === 'audioMessage' && "Record your voice for your loved one to hear"}
