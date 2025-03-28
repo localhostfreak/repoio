@@ -28,7 +28,6 @@ export function CreateContentModal({
   open, 
   isOpen,
   onOpenChange, 
-  onClose,
   onSuccess,
   contentType = 'album',
   type
@@ -37,7 +36,6 @@ export function CreateContentModal({
   const isModalOpen = open ?? isOpen ?? false;
   const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) onOpenChange(newOpen);
-    if (!newOpen && onClose) onClose();
   };
   const activeContentType = contentType ?? type ?? 'album';
   const [activeTab, setActiveTab] = useState<ContentType>(activeContentType);
