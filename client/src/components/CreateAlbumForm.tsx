@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { createAlbum } from '../lib/sanity-client';
 import { useToast } from '../hooks/useToast';
@@ -32,9 +31,9 @@ const VISUAL_EFFECTS = [
   { title: "Floating Hearts", value: "floatingHearts" }
 ];
 
-const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
+const CreateAlbumForm = ({ onClose, onCancel }: { onClose: () => void; onCancel?: () => void }) => {
   const { showToast } = useToast();
-  
+
   // Basic album info
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -42,7 +41,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [sharedWith, setSharedWith] = useState<string[]>([]);
   const [sharedWithInput, setSharedWithInput] = useState('');
-  
+
   // Advanced album features
   const [categories, setCategories] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
@@ -55,7 +54,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
     layout: 'grid' // default layout
   });
   const [effects, setEffects] = useState<string[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
 
   const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,11 +121,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
-    
+
     // Create the album object based on form data
     const album = {
       title,
@@ -152,7 +151,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
       } : null,
       effects: effects.length > 0 ? effects : null
     };
-    
+
     try {
       const result = await createAlbum(album);
 
@@ -165,9 +164,10 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
         title: 'Album created successfully!',
         type: 'success',
       });
-      
-      // Close the modal
+
+      // Close the modal - using onCancel as a fallback
       onClose();
+      if (onCancel) onCancel();
     } catch (error) {
       console.error('Error creating album:', error);
       showToast({
@@ -194,11 +194,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto p-2 relative">
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Create New Album</h2>
-        
+
         {/* Basic Information Section */}
         <div className="bg-white/5 p-4 rounded-lg">
           <h3 className="text-lg font-medium mb-3">Basic Information</h3>
-          
+
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium mb-1">Title *</label>
@@ -212,7 +212,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1">Description</label>
               <textarea
@@ -224,7 +224,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 maxLength={500}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1">Cover Image</label>
               <input
@@ -243,7 +243,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -254,7 +254,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
               />
               <label htmlFor="isPrivate" className="text-sm">Make this album private</label>
             </div>
-            
+
             {isPrivate && (
               <div>
                 <label className="block text-sm font-medium mb-1">Shared With (Emails)</label>
@@ -294,11 +294,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
             )}
           </div>
         </div>
-        
+
         {/* Categories & Tags Section */}
         <div className="bg-white/5 p-4 rounded-lg">
           <h3 className="text-lg font-medium mb-3">Categories & Tags</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Categories</label>
@@ -319,7 +319,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 ))}
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1">Tags</label>
               <div className="flex">
@@ -357,11 +357,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Date & Location Section */}
         <div className="bg-white/5 p-4 rounded-lg">
           <h3 className="text-lg font-medium mb-3">Date & Location</h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -383,7 +383,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-1">Location</label>
               <input
@@ -396,11 +396,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Theme & Visual Effects Section */}
         <div className="bg-white/5 p-4 rounded-lg">
           <h3 className="text-lg font-medium mb-3">Theme & Visual Effects</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Theme Color</label>
@@ -424,7 +424,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 ))}
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-2">Layout Style</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -442,7 +442,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
                   <span className="text-xs block mt-1">Grid</span>
                 </button>
-                
+
                 <button
                   type="button"
                   onClick={() => setTheme({ ...theme, layout: 'masonry' })}
@@ -462,7 +462,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                   </div>
                   <span className="text-xs block mt-1">Masonry</span>
                 </button>
-                
+
                 <button
                   type="button"
                   onClick={() => setTheme({ ...theme, layout: 'carousel' })}
@@ -479,7 +479,7 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
                 </button>
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium mb-2">Visual Effects</label>
               <div className="flex flex-wrap gap-2">
@@ -502,11 +502,11 @@ const CreateAlbumForm = ({ onClose }: { onClose: () => void }) => {
           </div>
         </div>
       </div>
-      
+
       <div className="flex justify-end space-x-3">
         <button
           type="button"
-          onClick={onClose}
+          onClick={onCancel || onClose} // Use onCancel if available, otherwise use onClose
           className="px-4 py-2 bg-white/10 rounded-md hover:bg-white/20"
           disabled={loading}
         >
