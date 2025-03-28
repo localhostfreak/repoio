@@ -1,0 +1,43 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-276SZO74.js?v=f32bc722:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+chunk-276SZO74.js?v=f32bc722:521 Warning: Connect(Droppable): Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead.
+    at Provider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:692:20)
+    at App (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:7224:25)
+    at ErrorBoundary2 (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:1721:35)
+    at DragDropContext (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:7344:19)
+    at div
+    at div
+    at div
+    at https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=f32bc722:173:13
+    at https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=f32bc722:398:13
+    at div
+    at https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=f32bc722:173:13
+    at Provider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XSD2Y4RK.js?v=f32bc722:38:15)
+    at https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=f32bc722:336:7
+    at _c (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/src/components/ui/scroll-area.tsx:21:11)
+    at MessagesSection (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/src/components/MessagesSection.tsx:89:23)
+    at div
+    at MotionComponent (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=f32bc722:942:40)
+    at ParallaxSection (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/src/components/ParallaxProvider.tsx:21:3)
+    at div
+    at div
+    at div
+    at div
+    at main
+    at Home (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/src/pages/home.tsx:35:21)
+    at Route (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f32bc722:323:16)
+    at Switch (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f32bc722:379:17)
+    at Router
+    at Provider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:692:20)
+    at App (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:7224:25)
+    at ErrorBoundary2 (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:1721:35)
+    at DragDropContext (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-beautiful-dnd.js?v=f32bc722:7344:19)
+    at Provider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XSD2Y4RK.js?v=f32bc722:38:15)
+    at TooltipProvider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f32bc722:61:5)
+    at QueryClientProvider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=f32bc722:2881:3)
+    at App
+    at QueryClientProvider (https://f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=f32bc722:2881:3)
+printWarning @ chunk-276SZO74.js?v=f32bc722:521
+framer-motion.js?v=f32bc722:693 Please ensure that the container has a non-static position, like 'relative', 'fixed', or 'absolute' to ensure scroll offset is calculated correctly.
+warnOnce @ framer-motion.js?v=f32bc722:693
