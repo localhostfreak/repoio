@@ -1,32 +1,104 @@
-
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Plus } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { PlusIcon, PhotoIcon, BookOpenIcon } from '@heroicons/react/24/solid';
 import CreateContentModal from './CreateContentModal';
 
-export default function CreateContentButton() {
+const CreateContentButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contentType, setContentType] = useState<'album' | 'memory'>('album');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const handleOpenModal = () => {
+  const openModal = (type: 'album' | 'memory') => {
+    setContentType(type);
     setIsModalOpen(true);
+    setIsDropdownOpen(false);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current && 
+        buttonRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <>
-      <Button
-        onClick={handleOpenModal}
-        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-xl bg-pink-600 hover:bg-pink-700 p-0 flex items-center justify-center z-50"
-        aria-label="Create new content"
-      >
-        <Plus size={24} className="text-white" />
-      </Button>
-      
+      <div className="fixed bottom-0 right-0 m-4 sm:m-6 z-10">
+        <button
+          ref={buttonRef}
+          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          aria-label="Create new content"
+        >
+          <PlusIcon className="h-6 w-6" />
+        </button>
+
+        {isDropdownOpen && (
+          <div 
+            ref={dropdownRef}
+            className="absolute bottom-16 right-0 bg-gray-800 rounded-lg shadow-xl py-2 min-w-[180px] z-20"
+          >
+            <button
+              className="w-full text-left px-4 py-2 hover:bg-gray-700 transition flex items-center gap-2"
+              onClick={() => openModal('album')}
+            >
+              <BookOpenIcon className="h-5 w-5 text-pink-400" />
+              <span>Create Album</span>
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 hover:bg-gray-700 transition flex items-center gap-2"
+              onClick={() => openModal('memory')}
+            >
+              <PhotoIcon className="h-5 w-5 text-pink-400" />
+              <span>Create Memory</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* For small screens: Fixed bottom bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/80 backdrop-blur-sm border-t border-gray-800 py-2 z-10">
+        <div className="flex justify-around">
+          <button
+            className="flex flex-col items-center px-3 py-1 text-xs"
+            onClick={() => openModal('album')}
+          >
+            <BookOpenIcon className="h-5 w-5 text-pink-400" />
+            <span>New Album</span>
+          </button>
+          <button
+            className="flex flex-col items-center px-3 py-1 text-xs"
+            onClick={() => openModal('memory')}
+          >
+            <PhotoIcon className="h-5 w-5 text-pink-400" />
+            <span>New Memory</span>
+          </button>
+        </div>
+      </div>
+
       <CreateContentModal 
-        open={isModalOpen} 
-        onOpenChange={setIsModalOpen}
-        onSuccess={() => setIsModalOpen(false)}
-        contentType="album"
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        type={contentType} 
       />
     </>
   );
-}
+};
+
+export default CreateContentButton;
