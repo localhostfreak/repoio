@@ -15,8 +15,7 @@ import {
 } from "@mui/material";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { useTheme } from "@mui/system";
-// eslint-disable-next-line react/no-deprecated
-import { DragDropContext, Droppable, Draggable, DraggableProvided } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DraggableProvided } from "@hello-pangea/dnd";
 import { Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";

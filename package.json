@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.9.1",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@mui/material": "^7.0.0",
@@ -68,7 +69,6 @@
     "next-sanity": "^9.9.6",
     "next-themes": "^0.4.6",
     "react": "^18.3.1",
-    "react-beautiful-dnd": "^13.1.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.1",
@@ -99,7 +99,6 @@
     "@tsparticles/engine": "^3.8.1",
     "@types/howler": "^2.2.12",
     "@types/react": "^18.3.11",
-    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.3.1",
     "@types/react-virtualized": "^9.22.2",
     "@types/ws": "^8.5.13",
