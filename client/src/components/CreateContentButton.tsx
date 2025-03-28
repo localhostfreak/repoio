@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Plus as PlusIcon, Image as PhotoIcon, BookOpen as BookOpenIcon } from "lucide-react";
 import { CreateContentModal } from './CreateContentModal';
@@ -39,7 +40,7 @@ const CreateContentButton: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-0 right-0 m-4 sm:m-6 z-10">
+      <div className="fixed bottom-0 right-0 m-4 sm:m-6 z-10 createContentButton">
         <button
           ref={buttonRef}
           className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
