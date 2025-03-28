@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { VisuallyHidden } from '@/components/ui/visually-hidden';
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import CreateLoveLetterForm from './CreateLoveLetterForm';
-import UploadGalleryItemForm from './UploadGalleryItemForm';
-import RecordAudioMessageForm from './RecordAudioMessageForm';
-import CreateAlbumForm from './CreateAlbumForm';
-import ErrorLogger from '@/lib/errorHandling';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Heart, Image, Mic, BookOpen } from "lucide-react";
+import CreateAlbumForm from "./CreateAlbumForm";
 
 export type ContentType = 'loveLetter' | 'galleryItem' | 'audioMessage' | 'album';
 
@@ -18,138 +18,84 @@ interface CreateContentModalProps {
   onSuccess?: () => void;
 }
 
-export function CreateContentModal({ 
-  open, 
-  onOpenChange, 
-  contentType, 
-  onSuccess 
+export function CreateContentModal({
+  open,
+  onOpenChange,
+  contentType,
+  onSuccess
 }: CreateContentModalProps) {
-  // Move useState hook inside component
-  const [isModalOpen, setIsModalOpen] = useState(open);
-  
-  const getTitle = () => {
+  // This renders the correct form based on content type
+
+  const renderContentForm = () => {
     switch (contentType) {
-      case 'loveLetter':
-        return 'Write a Love Letter';
-      case 'galleryItem':
-        return 'Share a Photo or Video';
-      case 'audioMessage':
-        return 'Record an Audio Message';
       case 'album':
-        return 'Create a Memory Album';
+        return (
+          <CreateAlbumForm 
+            onSuccess={() => {
+              if (onSuccess) onSuccess();
+              onOpenChange(false);
+            }}
+            onCancel={() => onOpenChange(false)}
+          />
+        );
+      case 'loveLetter':
+      case 'galleryItem':
+      case 'audioMessage':
       default:
-        return 'Create Content';
+        return (
+          <div className="py-4">
+            <p className="text-center text-gray-500">
+              Form for {contentType} content creation will be implemented soon.
+            </p>
+          </div>
+        );
     }
   };
-  
-  const getDescription = () => {
-    switch (contentType) {
-      case 'loveLetter':
-        return 'Express your feelings in words that will last forever';
-      case 'galleryItem':
-        return 'Share your special moments through photos and videos';
-      case 'audioMessage':
-        return 'Send your voice across the distance';
-      case 'album':
-        return 'Organize your memories into beautiful collections';
-      default:
-        return 'Create and share meaningful content';
-    }
-  };
-  
-  const handleError = (error: unknown, context: string) => {
-    ErrorLogger.log(
-      `Error in content modal: ${context}`,
-      'medium',
-      'CreateContentModal',
-      error instanceof Error ? error : new Error(String(error)),
-      { contentType, context }
+
+  // For album type, we don't need the default dialog styling
+  if (contentType === 'album') {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="w-full max-w-3xl p-0 bg-transparent border-none shadow-none">
+          {renderContentForm()}
+        </DialogContent>
+      </Dialog>
     );
-  };
-
-  const handleSuccess = () => {
-    if (onSuccess) onSuccess();
-    onOpenChange(false);
-  };
-
-  const handleCancel = () => {
-    onOpenChange(false);
-  };
-  
-  const renderForm = () => {
-    try {
-      switch (contentType) {
-        case 'loveLetter':
-          return (
-            <CreateLoveLetterForm 
-              onSuccess={handleSuccess} 
-              onCancel={handleCancel} 
-            />
-          );
-        case 'galleryItem':
-          return (
-            <UploadGalleryItemForm 
-              onSuccess={handleSuccess} 
-              onCancel={handleCancel} 
-            />
-          );
-        case 'audioMessage':
-          return (
-            <RecordAudioMessageForm 
-              onSuccess={handleSuccess}
-              onCancel={handleCancel}
-            />
-          );
-        case 'album':
-          return (
-            <CreateAlbumForm 
-              onSuccess={handleSuccess} 
-              onCancel={handleCancel} 
-            />
-          );
-        default:
-          return <div>Select a content type to create</div>;
-      }
-    } catch (error) {
-      handleError(error, 'renderForm');
-      return <div>Error loading form. Please try again.</div>;
-    }
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className={cn(
-          "max-w-lg mx-auto",
-          "sm:max-w-3xl md:max-w-4xl",
-          "p-0 border-none",
-          "bg-transparent shadow-none",
-          "overflow-hidden"
-        )}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{
-              type: "spring",
-              duration: 0.4,
-              bounce: 0.2
-            }}
-          >
-            {contentType === 'audioMessage' && (
-              <RecordAudioMessageForm 
-                onSuccess={handleSuccess}
-                onCancel={handleCancel}
-              />
+      <DialogContent className="w-full max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-2xl">
+            {contentType === 'loveLetter' && (
+              <>
+                <Heart className="text-pink-500" />
+                <span>Write a Love Letter</span>
+              </>
             )}
-            {/* Add other content type forms here */}
-          </motion.div>
-        </AnimatePresence>
+            {contentType === 'galleryItem' && (
+              <>
+                <Image className="text-blue-500" />
+                <span>Share a Photo/Video</span>
+              </>
+            )}
+            {contentType === 'audioMessage' && (
+              <>
+                <Mic className="text-red-500" />
+                <span>Record Voice Message</span>
+              </>
+            )}
+          </DialogTitle>
+          <DialogDescription>
+            {contentType === 'loveLetter' && "Express your feelings in a beautiful letter"}
+            {contentType === 'galleryItem' && "Share photos and videos of your special moments"}
+            {contentType === 'audioMessage' && "Record your voice for your loved one to hear"}
+          </DialogDescription>
+        </DialogHeader>
+
+        {renderContentForm()}
       </DialogContent>
     </Dialog>
   );
 }
-
-export default CreateContentModal;

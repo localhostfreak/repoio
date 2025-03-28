@@ -74,7 +74,7 @@ const Home = () => {
             ? "bg-gradient-to-br from-[#2A1B3D]/90 to-[#1A0F2A]/90"
             : "bg-gradient-to-br from-[#FFF5F5]/90 to-[#FFE6E6]/90"
         } backdrop-blur-sm font-lora antialiased`}>
-          
+
           <NavigationBar
             extraControls={
               <div className="flex gap-4 flex-wrap sm:flex-nowrap">
