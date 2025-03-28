@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -39,7 +40,7 @@ export function CreateContentModal({
     if (!newOpen && onClose) onClose();
   };
   const activeContentType = contentType ?? type ?? 'album';
-  const [activeTab, setActiveTab] = useState<ContentType>(contentType);
+  const [activeTab, setActiveTab] = useState<ContentType>(activeContentType);
 
   const handleSuccess = () => {
     if (onSuccess) {
@@ -47,8 +48,8 @@ export function CreateContentModal({
     }
   };
 
-  const onClose = () => {
-    onOpenChange(false);
+  const handleClose = () => {
+    if (onOpenChange) onOpenChange(false);
   };
 
   return (
@@ -82,36 +83,24 @@ export function CreateContentModal({
           </TabsList>
 
           <TabsContent value="album" className="mt-0 p-6">
-            <CreateAlbumForm onSuccess={handleSuccess} onCancel={onClose} />
+            <CreateAlbumForm onSuccess={handleSuccess} onCancel={handleClose} />
           </TabsContent>
-
+          
           <TabsContent value="photo" className="mt-0 p-6">
-            <div className="text-center p-10 bg-gray-50 rounded-lg">
-              <Image className="w-12 h-12 mx-auto text-pink-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Photo Upload</h3>
-              <p className="text-gray-600">
-                This feature is coming soon! You'll be able to upload individual photos and add them to albums.
-              </p>
+            <div className="text-center py-8">
+              <p className="text-gray-500">Photo upload feature coming soon...</p>
             </div>
           </TabsContent>
-
+          
           <TabsContent value="audio" className="mt-0 p-6">
-            <div className="text-center p-10 bg-gray-50 rounded-lg">
-              <Headphones className="w-12 h-12 mx-auto text-pink-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Audio Recording</h3>
-              <p className="text-gray-600">
-                This feature is coming soon! You'll be able to record or upload audio memories.
-              </p>
+            <div className="text-center py-8">
+              <p className="text-gray-500">Audio recording feature coming soon...</p>
             </div>
           </TabsContent>
-
+          
           <TabsContent value="letter" className="mt-0 p-6">
-            <div className="text-center p-10 bg-gray-50 rounded-lg">
-              <PenLine className="w-12 h-12 mx-auto text-pink-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Love Letter</h3>
-              <p className="text-gray-600">
-                This feature is coming soon! You'll be able to write and design beautiful digital love letters.
-              </p>
+            <div className="text-center py-8">
+              <p className="text-gray-500">Letter writing feature coming soon...</p>
             </div>
           </TabsContent>
         </Tabs>
