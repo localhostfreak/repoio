@@ -1,0 +1,78 @@
+
+> heart-whispers@1.0.0 dev
+> vite --host
+
+
+  VITE v5.4.14  ready in 493 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.31.128.40:5173/
+  ➜  press h + enter to show help
+2:18:19 PM [vite] Pre-transform error: /home/runner/workspace/client/src/components/ui/switch.tsx: Identifier 'React' has already been declared. (30:12)
+
+  28 | "use client"
+  29 |
+> 30 | import * as React from "react"
+     |             ^
+  31 | import * as SwitchPrimitives from "@radix-ui/react-switch"
+  32 |
+  33 | import { cn } from "@/lib/utils"
+2:18:20 PM [vite] Internal server error: /home/runner/workspace/client/src/components/ui/switch.tsx: Identifier 'React' has already been declared. (30:12)
+
+  28 | "use client"
+  29 |
+> 30 | import * as React from "react"
+     |             ^
+  31 | import * as SwitchPrimitives from "@radix-ui/react-switch"
+  32 |
+  33 | import { cn } from "@/lib/utils"
+  Plugin: vite:react-babel
+  File: /home/runner/workspace/client/src/components/ui/switch.tsx:30:12
+  28 |  "use client"
+  29 |  
+  30 |  import * as React from "react"
+     |              ^
+  31 |  import * as SwitchPrimitives from "@radix-ui/react-switch"
+  32 |  
+      at constructor (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:360:19)
+      at TypeScriptParserMixin.raise (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:3338:19)
+      at TypeScriptScopeHandler.checkRedeclarationInScope (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:1566:19)
+      at TypeScriptScopeHandler.declareName (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:1532:12)
+      at TypeScriptScopeHandler.declareName (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:7066:11)
+      at TypeScriptParserMixin.declareNameFromIdentifier (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:7494:16)
+      at TypeScriptParserMixin.checkIdentifier (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:7490:12)
+      at TypeScriptParserMixin.checkLVal (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:7431:12)
+      at TypeScriptParserMixin.finishImportSpecifier (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:13926:10)
+      at TypeScriptParserMixin.parseImportSpecifierLocal (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:13923:31)
+      at TypeScriptParserMixin.maybeParseStarImportSpecifier (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:14040:12)
+      at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:13901:39)
+      at TypeScriptParserMixin.parseImport (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:13895:17)
+      at TypeScriptParserMixin.parseImport (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9278:26)
+      at TypeScriptParserMixin.parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12540:27)
+      at TypeScriptParserMixin.parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9365:18)
+      at TypeScriptParserMixin.parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12432:17)
+      at TypeScriptParserMixin.parseModuleItem (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12409:17)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12980:36)
+      at TypeScriptParserMixin.parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12973:10)
+      at TypeScriptParserMixin.parseProgram (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12306:10)
+      at TypeScriptParserMixin.parseTopLevel (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12296:25)
+      at TypeScriptParserMixin.parse (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:14152:10)
+      at TypeScriptParserMixin.parse (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9982:18)
+      at parse (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:14186:38)
+      at parser (/home/runner/workspace/node_modules/@babel/core/lib/parser/index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (/home/runner/workspace/node_modules/@babel/core/lib/transformation/normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (/home/runner/workspace/node_modules/@babel/core/lib/transformation/index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (/home/runner/workspace/node_modules/@babel/core/lib/transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (/home/runner/workspace/node_modules/gensync/index.js:261:32)
+      at /home/runner/workspace/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/home/runner/workspace/node_modules/gensync/index.js:223:11)
+      at /home/runner/workspace/node_modules/gensync/index.js:189:28
+      at /home/runner/workspace/node_modules/@babel/core/lib/gensync-utils/async.js:67:7
+      at /home/runner/workspace/node_modules/gensync/index.js:113:33
+      at step (/home/runner/workspace/node_modules/gensync/index.js:287:14)
+      at /home/runner/workspace/node_modules/gensync/index.js:273:13
+      at async.call.result.err.err (/home/runner/workspace/node_modules/gensync/index.js:223:11)
