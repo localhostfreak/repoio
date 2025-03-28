@@ -22,9 +22,18 @@ export default defineConfig({
         ]
       : []),
   ],
-  root: "client", // Add this line to specify the client directory
+  server: {
+    host: "0.0.0.0",
+    hmr: {
+      clientPort: 443,
+    },
+    allowedHosts: [
+      "f549cd52-9c63-4183-9a30-6421402d50e1-00-1dy4j9yw7r7m9.sisko.replit.dev", // Add the blocked host here
+    ],
+  },
+  root: "client",
   define: {
-    'process.env': process.env
+    "process.env": process.env,
   },
   resolve: {
     alias: {
@@ -36,5 +45,5 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
-  }
+  },
 });
