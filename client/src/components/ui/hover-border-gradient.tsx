@@ -93,7 +93,13 @@ export function HoverBorderGradient({
         }}
         transition={{ ease: "linear", duration: duration ?? 1 }}
       />
-      <div className="bg-black absolute z-1 flex-none inset-[2px] rounded-[100px]" />
+      <div 
+        className="absolute z-1 flex-none inset-[2px] rounded-[100px] bg-background transition-all duration-300 ease-in-out"
+        style={{
+          backdropFilter: "blur(8px)",
+        }}
+      />
+      <div className="relative z-2">{children}</div>
     </Tag>
   );
 }
