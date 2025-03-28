@@ -86,7 +86,12 @@ export default function CreateContentModal({
           <Moon className="h-4 w-4" />
         </div>
 
-        <DialogHeader className="p-6 pb-0">
+        <DialogHeader className="p-6 pb-0 relative">
+          <div className="absolute right-0 top-0 flex items-center space-x-2 mr-2">
+            <Label htmlFor="theme-mode" className="text-xs">Dark</Label>
+            <Switch id="theme-mode" className="data-[state=checked]:bg-pink-500" />
+            <Label htmlFor="theme-mode" className="text-xs">Light</Label>
+          </div>
           <DialogTitle className="text-2xl flex items-center">
             <Heart className="mr-2 text-pink-500 h-5 w-5" /> 
             <span>Create Something Special {randomEmoji}</span>

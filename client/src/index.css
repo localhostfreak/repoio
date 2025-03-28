@@ -4,6 +4,56 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Love-themed styling */
+.love-text {
+  color: #ff6b9d;
+  font-family: 'Dancing Script', cursive;
+}
+
+.love-gradient {
+  background: linear-gradient(135deg, #ff7eb3, #ff65a3);
+}
+
+.love-quote {
+  font-style: italic;
+  color: #ff85a2;
+  border-left: 3px solid #ff85a2;
+  padding-left: 1rem;
+}
+
+.heart-border {
+  border: 2px solid #ff85a2;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(255, 107, 157, 0.2);
+}
+
+/* Dark mode love theme */
+.dark .love-text {
+  color: #ff85a2;
+}
+
+.dark .love-quote {
+  color: #ff9bb1;
+  border-left: 3px solid #ff9bb1;
+}
+
+/* Animation for heart effect */
+@keyframes float-hearts {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.floating-heart {
+  position: absolute;
+  animation: float-hearts 4s ease-in infinite;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

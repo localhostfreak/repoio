@@ -31,7 +31,7 @@ const VISUAL_EFFECTS = [
   { title: "Floating Hearts", value: "floatingHearts" }
 ];
 
-const CreateAlbumForm = ({ onClose, onCancel }: { onClose: () => void; onCancel?: () => void }) => {
+const CreateAlbumForm = ({ onClose, onCancel, onOpenChange }: { onClose: () => void; onCancel?: () => void; onOpenChange?: (open: boolean) => void }) => {
   const { showToast } = useToast();
 
   // Basic album info
@@ -166,7 +166,8 @@ const CreateAlbumForm = ({ onClose, onCancel }: { onClose: () => void; onCancel?
       });
 
       // Close the modal - using onCancel as a fallback
-      onClose();
+      if (onOpenChange) onOpenChange(false); //Using onOpenChange if available
+      else onClose();
       if (onCancel) onCancel();
     } catch (error) {
       console.error('Error creating album:', error);
