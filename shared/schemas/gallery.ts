@@ -469,71 +469,138 @@ export const album = defineType({
             defineField({
               name: 'layout',
               title: 'Layout',
-              type: 'string',
-              options: {
-                list: [
-                  { title: 'Small', value: 'small' },
-                  { title: 'Medium', value: 'medium' },
-                  { title: 'Large', value: 'large' },
-                  { title: 'Full Width', value: 'full' }
-                ]
-              }
+              type: 'string'
             })
-          ],
-          preview: {
-            select: {
-              title: 'caption',
-              subtitle: 'layout',
-              media: 'photo.image'
-            }
-          }
+          ]
         })
       ]
     }),
+    // Add missing fields
     defineField({
-      name: 'layout',
-      title: 'Default Layout',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Grid', value: 'grid' },
-          { title: 'Masonry', value: 'masonry' },
-          { title: 'Slideshow', value: 'slideshow' },
-          { title: 'Story', value: 'story' }
-        ]
-      },
-      initialValue: 'grid'
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [
+        { 
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Vacation', value: 'vacation' },
+              { title: 'Date Night', value: 'dateNight' },
+              { title: 'Anniversary', value: 'anniversary' },
+              { title: 'First Meeting', value: 'firstMeeting' },
+              { title: 'Holidays', value: 'holidays' },
+              { title: 'Special Moments', value: 'specialMoments' }
+            ]
+          }
+        }
+      ]
     }),
     defineField({
-      name: 'publishDate',
-      title: 'Publish Date',
-      type: 'datetime'
+      name: 'effects',
+      title: 'Visual Effects',
+      type: 'array',
+      of: [
+        { 
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Heart Frame', value: 'heartFrame' },
+              { title: 'Soft Glow', value: 'softGlow' },
+              { title: 'Vintage Filter', value: 'vintageFilter' },
+              { title: 'Polaroid Style', value: 'polaroid' },
+              { title: 'Floating Hearts', value: 'floatingHearts' }
+            ]
+          }
+        }
+      ]
     }),
     defineField({
-      name: 'author',
-      title: 'Author',
-      type: 'reference',
-      to: [{ type: 'profile' }]
-    }),
-    defineField({
-      name: 'isPublished',
-      title: 'Published',
+      name: 'isPrivate',
+      title: 'Private',
       type: 'boolean',
-      initialValue: false
+      description: 'Restrict this album to specific viewers listed in "Shared With".',
+      initialValue: false,
     }),
     defineField({
-      name: 'shareSettings',
-      title: 'Share Settings',
-      type: 'shareSettings'
+      name: 'sharedWith',
+      title: 'Shared With',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description:
+        'Email addresses or user IDs who can view this album if private (max 50 unique entries).',
+      options: {
+        layout: 'tags',
+      },
+      validation: (Rule) =>
+        Rule.unique()
+          .max(50)
+          .custom((items) =>
+            items && items.every((item) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item))
+              ? true
+              : 'All entries must be valid email addresses',
+          ),
+    }),
+    defineField({
+      name: 'theme',
+      title: 'Album Theme',
+      type: 'object',
+      fields: [
+        { 
+          name: 'color',
+          title: 'Theme Color',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Romantic Red', value: '#FF6B6B' },
+              { title: 'Passionate Pink', value: '#FF85A2' },
+              { title: 'Dreamy Lavender', value: '#C5A3FF' },
+              { title: 'Ocean Blue', value: '#45B3E0' },
+              { title: 'Forest Green', value: '#4CAF50' },
+              { title: 'Sunset Orange', value: '#FF9966' }
+            ]
+          }
+        },
+        { name: 'font', title: 'Font Family', type: 'string' },
+        { name: 'layout', title: 'Layout Style', type: 'string' }
+      ]
+    }),
+    defineField({
+      name: 'dateRange',
+      title: 'Date Range',
+      type: 'object',
+      fields: [
+        { name: 'from', type: 'date', title: 'From' },
+        { name: 'to', type: 'date', title: 'To' }
+      ]
+    }),
+    defineField({
+      name: 'location',
+      title: 'Location',
+      type: 'geopoint'
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{ type: 'string' }]
     })
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'description',
-      media: 'coverImage'
-    }
-  }
+      media: 'coverImage',
+      itemsCount: 'items.length',
+    },
+    prepare({ title, media, itemsCount }: { title?: string; media?: any; itemsCount?: number }) {
+      const count = itemsCount ?? 0;
+      return {
+        title: title || 'Untitled Album',
+        media,
+        subtitle: `${count} item${count === 1 ? '' : 's'}`,
+      };
+    },
+  },
 });
 
 export const profile = defineType({

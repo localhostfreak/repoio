@@ -1,9 +1,9 @@
 
 import { SchemaTypeDefinition } from 'sanity';
-import { album } from './schemas/gallery';
+import { albumSchema, galleryItemSchema, audioMessageSchema } from './sanity-schemas';
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [album],
+  types: [albumSchema, galleryItemSchema, audioMessageSchema],
 };
 
 export default schema;
