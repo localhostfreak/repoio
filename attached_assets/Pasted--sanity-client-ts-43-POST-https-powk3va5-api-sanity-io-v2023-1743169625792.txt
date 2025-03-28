@@ -1,0 +1,82 @@
+
+sanity-client.ts:43 
+            
+            
+           POST https://powk3va5.api.sanity.io/v2023-05-03/data/mutate/production?returnIds=true&returnDocuments=true&visibility=sync 403 (Forbidden)
+d @ @sanity_client.js?v=ec795a3e:225
+(anonymous) @ @sanity_client.js?v=ec795a3e:94
+publish @ @sanity_client.js?v=ec795a3e:77
+(anonymous) @ @sanity_client.js?v=ec795a3e:468
+Observable2._trySubscribe @ @sanity_client.js?v=ec795a3e:1051
+(anonymous) @ @sanity_client.js?v=ec795a3e:1045
+errorContext @ @sanity_client.js?v=ec795a3e:820
+Observable2.subscribe @ @sanity_client.js?v=ec795a3e:1043
+(anonymous) @ @sanity_client.js?v=ec795a3e:4130
+Observable2._trySubscribe @ @sanity_client.js?v=ec795a3e:1051
+(anonymous) @ @sanity_client.js?v=ec795a3e:1045
+errorContext @ @sanity_client.js?v=ec795a3e:820
+Observable2.subscribe @ @sanity_client.js?v=ec795a3e:1043
+(anonymous) @ @sanity_client.js?v=ec795a3e:2997
+(anonymous) @ @sanity_client.js?v=ec795a3e:1128
+(anonymous) @ @sanity_client.js?v=ec795a3e:1045
+errorContext @ @sanity_client.js?v=ec795a3e:820
+Observable2.subscribe @ @sanity_client.js?v=ec795a3e:1043
+(anonymous) @ @sanity_client.js?v=ec795a3e:2763
+(anonymous) @ @sanity_client.js?v=ec795a3e:1128
+(anonymous) @ @sanity_client.js?v=ec795a3e:1045
+errorContext @ @sanity_client.js?v=ec795a3e:820
+Observable2.subscribe @ @sanity_client.js?v=ec795a3e:1043
+(anonymous) @ @sanity_client.js?v=ec795a3e:2763
+(anonymous) @ @sanity_client.js?v=ec795a3e:1128
+(anonymous) @ @sanity_client.js?v=ec795a3e:1045
+errorContext @ @sanity_client.js?v=ec795a3e:820
+Observable2.subscribe @ @sanity_client.js?v=ec795a3e:1043
+(anonymous) @ @sanity_client.js?v=ec795a3e:2695
+lastValueFrom @ @sanity_client.js?v=ec795a3e:2692
+create @ @sanity_client.js?v=ec795a3e:4826
+createAlbum @ sanity-client.ts:43
+handleSubmit @ CreateAlbumForm.tsx:46
+callCallback2 @ chunk-276SZO74.js?v=ec795a3e:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=ec795a3e:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=ec795a3e:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=ec795a3e:3736
+executeDispatch @ chunk-276SZO74.js?v=ec795a3e:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=ec795a3e:7034
+processDispatchQueue @ chunk-276SZO74.js?v=ec795a3e:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=ec795a3e:7051
+(anonymous) @ chunk-276SZO74.js?v=ec795a3e:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=ec795a3e:18913
+batchedUpdates @ chunk-276SZO74.js?v=ec795a3e:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=ec795a3e:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=ec795a3e:5478
+dispatchEvent @ chunk-276SZO74.js?v=ec795a3e:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=ec795a3e:5449
+sanity-client.ts:51 Error creating album in Sanity: ClientError: transaction failed: Insufficient permissions; permission "create" required:
+- Insufficient permissions; permission "create" required
+    at onResponse (@sanity_client.js?v=ec795a3e:3277:13)
+    at @sanity_client.js?v=ec795a3e:87:67
+    at @sanity_client.js?v=ec795a3e:97:16
+    at @sanity_client.js?v=ec795a3e:102:9
+    at @sanity_client.js?v=ec795a3e:221:25
+    at a4.onreadystatechange (@sanity_client.js?v=ec795a3e:223:6)
+createAlbum @ sanity-client.ts:51
+await in createAlbum
+handleSubmit @ CreateAlbumForm.tsx:46
+callCallback2 @ chunk-276SZO74.js?v=ec795a3e:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=ec795a3e:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=ec795a3e:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=ec795a3e:3736
+executeDispatch @ chunk-276SZO74.js?v=ec795a3e:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=ec795a3e:7034
+processDispatchQueue @ chunk-276SZO74.js?v=ec795a3e:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=ec795a3e:7051
+(anonymous) @ chunk-276SZO74.js?v=ec795a3e:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=ec795a3e:18913
+batchedUpdates @ chunk-276SZO74.js?v=ec795a3e:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=ec795a3e:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=ec795a3e:5478
+dispatchEvent @ chunk-276SZO74.js?v=ec795a3e:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=ec795a3e:5449
+CreateAlbumForm.tsx:70 Error creating album: Error: Failed to create album in Sanity
+    at createAlbum (sanity-client.ts:52:11)
+    at a
