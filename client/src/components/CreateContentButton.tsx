@@ -4,26 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Plus } from 'lucide-react';
 import CreateContentModal from './CreateContentModal';
 
-function CreateContentButton() {
-  const [showModal, setShowModal] = useState(false);
+export default function CreateContentButton() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
 
   return (
     <>
       <Button
-        onClick={() => setShowModal(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 shadow-lg z-10 p-0 flex items-center justify-center"
+        onClick={handleOpenModal}
+        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-xl bg-pink-600 hover:bg-pink-700 p-0 flex items-center justify-center z-50"
         aria-label="Create new content"
       >
-        <Plus className="h-6 w-6 text-white" />
+        <Plus size={24} className="text-white" />
       </Button>
-
+      
       <CreateContentModal 
-        open={showModal} 
-        onOpenChange={setShowModal} 
-        onSuccess={() => setShowModal(false)}
+        open={isModalOpen} 
+        onOpenChange={setIsModalOpen}
+        onSuccess={() => setIsModalOpen(false)}
+        contentType="album"
       />
     </>
   );
 }
-
-export default CreateContentButton;

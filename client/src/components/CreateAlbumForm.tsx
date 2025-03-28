@@ -79,15 +79,15 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto border-pink-200 shadow-lg">
-      <CardHeader className="bg-pink-50 rounded-t-lg">
-        <CardTitle className="text-2xl font-serif text-pink-800">Create a Memory Album</CardTitle>
-        <CardDescription>Organize your cherished memories into a beautiful collection</CardDescription>
+    <Card className="w-full border-pink-200 shadow-lg">
+      <CardHeader className="bg-pink-50 rounded-t-lg p-4 sm:p-6">
+        <CardTitle className="text-xl sm:text-2xl font-serif text-pink-800">Create a Memory Album</CardTitle>
+        <CardDescription className="text-sm sm:text-base">Organize your cherished memories into a beautiful collection</CardDescription>
       </CardHeader>
 
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4 pt-6">
-          <div className="space-y-2">
+        <CardContent className="space-y-3 sm:space-y-4 p-4 sm:pt-6 sm:px-6">
+          <div className="space-y-1 sm:space-y-2">
             <Label htmlFor="title" className="text-pink-700">Album Title</Label>
             <Input
               id="title"
@@ -125,17 +125,17 @@ export function CreateAlbumForm({ onSuccess, onCancel }: CreateAlbumFormProps) {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between border-t border-pink-100 pt-4">
+        <CardFooter className="flex justify-between border-t border-pink-100 p-4 sm:pt-4 sm:px-6">
           <Button 
             variant="outline" 
             onClick={onCancel}
-            className="border-pink-300 text-pink-700 hover:bg-pink-50"
+            className="border-pink-300 text-pink-700 hover:bg-pink-50 text-sm sm:text-base px-3 sm:px-4"
           >
             Cancel
           </Button>
           <Button 
             type="submit" 
-            className="bg-pink-600 hover:bg-pink-700 text-white"
+            className="bg-pink-600 hover:bg-pink-700 text-white text-sm sm:text-base px-3 sm:px-4"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Creating..." : "Create Album"}
